@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13 # Ou a versão que preferir
+    ports:
+      - '${DB_PORT}:5432' # Porta do host : Porta do container
+    environment:
+      POSTGRES_USER: '${DB_USER}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+      POSTGRES_DB: '${DATABSE}' # O nome do banco que ele vai criar automático
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Para não perder dados se desligar o container
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    ports:
+      - '${PORT_jenkins}:8080'
+      - '${PORT_EXTERNO_AGENTES_JENKINS}:50000'
+    volumes:
+      - jenkins_home:/var/jenkins_home
+
+volumes:
+  pgdata:
+  jenkins_home:
