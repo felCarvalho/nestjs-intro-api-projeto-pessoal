@@ -12,14 +12,5 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data # Para não perder dados se desligar o container
 
-  jenkins:
-    image: jenkins/jenkins:lts
-    ports:
-      - '${PORT_jenkins}:8080'
-      - '${PORT_EXTERNO_AGENTES_JENKINS}:50000'
-    volumes:
-      - jenkins_home:/var/jenkins_home
-
 volumes:
   pgdata:
-  jenkins_home:

@@ -10,9 +10,15 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
-  app.use(cookieParser(configService.get('SECRET_COOKIE')));
-  app.enableCors();
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.use(cookieParser());
+  app.enableCors({
+    origin: [
+      configService.get<string>('LOCALHOST_CLIENT'),
+      configService.get<string>('LOCALHOST_NGROK'),
+    ].filter(Boolean),
+    credentials: true,
+  });
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
   const config = new DocumentBuilder()
     .setTitle('NestJS Intro')
