@@ -1,36 +1,46 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import { MikroOrmMiddleware, MikroOrmModule } from '@mikro-orm/nestjs';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import defineConfig from './config/mikro-orm.config';
+import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CategoryModule } from './category/category.module';
+import { CreateTaskOrquestradorModule } from './shared/orquestador/create-task/create-task.module';
+import { CreateUserOrquestradorModule } from './shared/orquestador/create-user/create-user.module';
+import { AuthModule } from './authentication/auth.module';
 
 @Module({
   imports: [
     UsersModule,
-    ConfigModule.forRoot({ cache: true }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
-        host: await configService.get('DB_HOST'),
-        port: await configService.get('DB_PORT'),
-        username: await configService.get('DB_NAME'),
-        password: await configService.get('DB_PASSWORD'),
-        database: await configService.get('DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-      }),
-    }),
-    AuthModule,
-    ConfigModule,
     TasksModule,
     CategoryModule,
+    CreateTaskOrquestradorModule,
+    CreateUserOrquestradorModule,
+    AuthModule,
+    ConfigModule.forRoot({ cache: true, isGlobal: true }),
+    MikroOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: () => ({
+        ...defineConfig,
+        autoLoadEntities: true,
+      }),
+      driver: PostgreSqlDriver,
+    }),
   ],
   controllers: [],
   providers: [ConfigService, { provide: APP_PIPE, useClass: ValidationPipe }],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Isso garante que cada request tenha seu próprio 'fork' do EntityManager
+    consumer.apply(MikroOrmMiddleware).forRoutes('*');
+  }
+}

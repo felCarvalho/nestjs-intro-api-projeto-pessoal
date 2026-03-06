@@ -1,13 +1,16 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UsersService } from './service/users.service';
+import { CreateUserDto } from '../shared/orquestador/create-user/create-user.dto';
+import { CreateUserOrquestrador } from '../shared/orquestador/create-user/create-user.orquestrador';
 
-@Controller('criar-usuario')
+@Controller()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.createUsers(createUserDto);
+  constructor(
+    private readonly userService: UsersService,
+    private readonly createUserOrquestrador: CreateUserOrquestrador,
+  ) {}
+  @Post('criar-conta')
+  async createUser(@Body() createUserDto: CreateUserDto) {
+    return await this.createUserOrquestrador.createUser(createUserDto);
   }
 }

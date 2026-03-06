@@ -1,11 +1,11 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateCategoryDto {
   @IsString()
-  @MaxLength(255)
-  title: string;
+  @IsNotEmpty()
+  titleCategory: string;
 
   @IsString()
-  @MaxLength(255)
-  description: string;
+  @IsNotEmpty()
+  descriptionCategory: string;
 }

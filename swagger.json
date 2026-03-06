@@ -1,53 +1,12 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/criar-usuario": {
+    "/login": {
       "post": {
-        "operationId": "UsersController_create",
+        "operationId": "AuthController_login",
         "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            }
-          }
-        },
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/auth/login": {
-      "post": {
-        "operationId": "AuthController_loginLocal",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
+          "201": {
             "description": ""
           }
         },
@@ -56,20 +15,13 @@
         ]
       }
     },
-    "/auth/logout": {
+    "/refresh-token": {
       "post": {
-        "operationId": "AuthController_logout",
+        "operationId": "AuthController_refresh",
         "parameters": [],
         "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
+          "201": {
+            "description": ""
           }
         },
         "tags": [
@@ -77,9 +29,23 @@
         ]
       }
     },
-    "/home/create-tasks": {
+    "/home": {
+      "get": {
+        "operationId": "TasksController_getAllTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/criar-rotina": {
       "post": {
-        "operationId": "TasksController_create",
+        "operationId": "CreateTaskOrquestradorController_createTask",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -92,247 +58,50 @@
           }
         },
         "responses": {
-          "default": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Tasks"
-        ]
-      }
-    },
-    "/home": {
-      "get": {
-        "operationId": "TasksController_findAll",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Tasks"
-        ]
-      }
-    },
-    "/home/{id}": {
-      "get": {
-        "operationId": "TasksController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Tasks"
-        ]
-      },
-      "patch": {
-        "operationId": "TasksController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateTaskDto"
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
               }
             }
           }
         },
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        },
         "tags": [
-          "Tasks"
-        ]
-      },
-      "delete": {
-        "operationId": "TasksController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "number"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "Tasks"
+          "CreateTaskOrquestrador"
         ]
       }
     },
-    "/category": {
+    "/criar-conta": {
       "post": {
-        "operationId": "CategoryController_create",
+        "operationId": "UserOrquestradoController_createUser",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateCategoryDto"
+                "$ref": "#/components/schemas/CreateUserDto"
               }
             }
           }
         },
         "responses": {
-          "default": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object"
                 }
               }
             }
           }
         },
         "tags": [
-          "Category"
-        ]
-      },
-      "get": {
-        "operationId": "CategoryController_findAll",
-        "parameters": [],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Category"
-        ]
-      }
-    },
-    "/category/{id}": {
-      "get": {
-        "operationId": "CategoryController_findOne",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Category"
-        ]
-      },
-      "patch": {
-        "operationId": "CategoryController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateCategoryDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Category"
-        ]
-      },
-      "delete": {
-        "operationId": "CategoryController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Category"
+          "UserOrquestrado"
         ]
       }
     }
@@ -352,148 +121,60 @@
   "servers": [],
   "components": {
     "schemas": {
+      "CreateTaskDto": {
+        "type": "object",
+        "properties": {
+          "titleTask": {
+            "type": "string"
+          },
+          "descriptionTask": {
+            "type": "string"
+          },
+          "titleCategory": {
+            "type": "string"
+          },
+          "descriptionCategory": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "titleTask",
+          "descriptionTask",
+          "titleCategory",
+          "descriptionCategory"
+        ]
+      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
-            "maxLength": 100
+            "minLength": 8,
+            "maxLength": 150
           },
-          "email": {
+          "identifier": {
             "type": "string",
+            "minLength": 8,
             "maxLength": 150,
             "format": "email"
           },
           "password": {
             "type": "string",
+            "minLength": 8,
+            "maxLength": 150
+          },
+          "passwordConfirm": {
+            "type": "string",
+            "minLength": 8,
             "maxLength": 150
           }
         },
         "required": [
           "name",
-          "email",
-          "password"
+          "identifier",
+          "password",
+          "passwordConfirm"
         ]
-      },
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "publicId": {
-            "type": "string"
-          },
-          "createdAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "deletedAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "publicId",
-          "createdAt",
-          "updatedAt",
-          "deletedAt",
-          "name",
-          "email",
-          "password"
-        ]
-      },
-      "LoginDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "maxLength": 150,
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "maxLength": 150
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "CreateTaskDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 255
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 255
-          }
-        },
-        "required": [
-          "title",
-          "description"
-        ]
-      },
-      "UpdateTaskDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 255
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 255
-          }
-        }
-      },
-      "CreateCategoryDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 255
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 255
-          }
-        },
-        "required": [
-          "title",
-          "description"
-        ]
-      },
-      "UpdateCategoryDto": {
-        "type": "object",
-        "properties": {
-          "title": {
-            "type": "string",
-            "maxLength": 255
-          },
-          "description": {
-            "type": "string",
-            "maxLength": 255
-          }
-        }
       }
     }
   }

@@ -1,4 +1,19 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateCategoryDto } from './create-category.dto';
+import { IsString, IsNotEmpty } from 'class-validator';
 
-export class UpdateCategoryDto extends PartialType(CreateCategoryDto) {}
+export class UpdateCategoryDto {
+  @IsString()
+  @IsNotEmpty()
+  titleCategory: string;
+
+  @IsString()
+  @IsNotEmpty()
+  descriptionCategory: string;
+
+  @IsString()
+  @IsNotEmpty()
+  idUser: string;
+
+  @IsString()
+  @IsNotEmpty()
+  id: string;
+}

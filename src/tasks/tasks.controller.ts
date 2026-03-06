@@ -3,44 +3,23 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
-  Delete,
-  ParseIntPipe,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
-import { TasksService } from './tasks.service';
-import { CreateTaskDto } from './dto/create-task.dto';
+import { TasksService } from './service/task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { User } from '../shared/core/@custom-decorators/user-request/user.request';
+import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('home')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  @Post('create-tasks')
-  create(@Body() createTaskDto: CreateTaskDto) {
-    // return this.tasksService.create(createTaskDto);
-  }
-
   @Get()
-  findAll() {
-    // return this.tasksService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    // return this.tasksService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateTaskDto: UpdateTaskDto,
-  ) {
-    // return this.tasksService.update(id, updateTaskDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    // return this.tasksService.remove(id);
+  async getAllTasks(@User() user: { sub: string }) {
+    console.log(user);
+    return await this.tasksService.findAllTasks(user.sub);
   }
 }
