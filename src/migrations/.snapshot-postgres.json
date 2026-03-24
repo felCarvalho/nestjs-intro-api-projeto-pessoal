@@ -828,6 +828,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "default": "null",
           "mappedType": "uuid"
         },
         "completed": {
@@ -877,6 +878,16 @@
       "name": "tasks",
       "schema": "public",
       "indexes": [
+        {
+          "columnNames": [
+            "title"
+          ],
+          "composite": false,
+          "keyName": "tasks_title_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "tasks_pkey",
           "columnNames": [

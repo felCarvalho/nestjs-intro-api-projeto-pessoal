@@ -12,17 +12,19 @@ import { UpdateTaskDto } from '../dto/update-task.dto';
 
 export abstract class TaskRepositoryContract<T> {
   abstract findById: (id: string) => Promise<T | null>;
+  abstract findByIdDeleted: (id: string) => Promise<T | null>;
   abstract findAllBy: (id: string) => Promise<T[]>;
   abstract findTitle: (name: string) => Promise<T | null>;
   abstract findAllTasksUser: (id: string) => Promise<T[]>;
   abstract createTask(task: Tasks): void;
+  abstract searchTask(query: string, idUser: string): Promise<T[]>;
 }
 
 export abstract class TaskBuilderContract<T> {
   abstract setTitle(title: string): this;
   abstract setDescription(description: string): this;
   abstract setCategory(category: ICategory): this;
-  abstract setCompleted(completed: 'Incompleta' | 'Concluida'): this;
+  abstract setCompleted(completed: 'Incompleta' | 'Concluída'): this;
   abstract setCreateDate(date: string): this;
   abstract setUser(user: IUser): this;
   abstract setUpdateDate(date: string): this;

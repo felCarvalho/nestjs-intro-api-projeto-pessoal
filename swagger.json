@@ -41,6 +41,95 @@
         "tags": [
           "Tasks"
         ]
+      },
+      "post": {
+        "operationId": "TasksController_createTask",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/home/buscar/{search}": {
+      "post": {
+        "operationId": "TasksController_searchTask",
+        "parameters": [
+          {
+            "name": "search",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/home/{id}": {
+      "patch": {
+        "operationId": "TasksController_updateTask",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      },
+      "delete": {
+        "operationId": "TasksController_deleteTask",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
       }
     },
     "/criar-rotina": {
@@ -121,6 +210,37 @@
   "servers": [],
   "components": {
     "schemas": {
+      "UpdateTaskDto": {
+        "type": "object",
+        "properties": {
+          "completed": {
+            "type": "string"
+          },
+          "titleTask": {
+            "type": "string"
+          },
+          "descriptionTask": {
+            "type": "string"
+          },
+          "idUser": {
+            "type": "string"
+          },
+          "idTask": {
+            "type": "string"
+          },
+          "deleted": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "completed",
+          "titleTask",
+          "descriptionTask",
+          "idUser",
+          "idTask",
+          "deleted"
+        ]
+      },
       "CreateTaskDto": {
         "type": "object",
         "properties": {
@@ -128,13 +248,17 @@
             "type": "string"
           },
           "descriptionTask": {
-            "type": "string"
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 255
           },
           "titleCategory": {
             "type": "string"
           },
           "descriptionCategory": {
-            "type": "string"
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 255
           }
         },
         "required": [

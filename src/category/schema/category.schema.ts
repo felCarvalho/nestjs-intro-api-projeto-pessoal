@@ -24,7 +24,7 @@ export const categorySchema = new EntitySchema<Category>({
       type: 'string',
       length: 150,
     },
-    user: { type: 'uuid', kind: 'm:1', entity: () => User },
+    user: { kind: 'm:1', entity: () => User },
     updateAt: { type: 'timestamptz', defaultRaw: 'now()' },
     createAt: { type: 'timestamptz', defaultRaw: 'now()' },
     deleteAt: { type: 'timestamptz', nullable: true, default: null },

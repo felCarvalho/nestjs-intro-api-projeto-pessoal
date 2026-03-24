@@ -14,7 +14,7 @@ export class BaseAuth implements BaseAuthContract {
     delete (payload as any).exp;
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get('JWT_SECRET'),
-      expiresIn: '1m',
+      expiresIn: '15m',
     });
   }
 
