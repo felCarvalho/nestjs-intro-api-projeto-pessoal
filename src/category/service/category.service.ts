@@ -60,7 +60,7 @@ export class CategoryService {
       category.titleCategory,
     );
 
-    if (!findCategory) {
+    if (findCategory) {
       notification
         .setType('ERROR')
         .setMessage('Ops! Já existe uma categoria com esse mesmo titulo')
@@ -77,6 +77,7 @@ export class CategoryService {
     categoryBuilder.setCreateDate(date);
     categoryBuilder.setUpdateDate(date);
     const categoryBuild = categoryBuilder.build();
+    console.log(categoryBuild)
 
     if (!categoryBuild.success) {
       notification

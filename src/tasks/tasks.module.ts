@@ -28,7 +28,7 @@ import { TasksController } from './tasks.controller';
         notification: () => NotificationBuilderContract,
         tasks: Tasks,
       ) => {
-        return new TasksBuilder(result(), notification(), tasks);
+        return () => new TasksBuilder(result(), notification(), tasks);
       },
       inject: [ResultBuilderContract, NotificationBuilderContract],
     },

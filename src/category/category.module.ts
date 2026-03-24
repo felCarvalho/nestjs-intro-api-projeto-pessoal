@@ -4,8 +4,8 @@ import { CategoryBuilderContracts } from './contracts/index.contracts';
 import { CategoryRepository } from './repository/category.repository';
 import { CategoryRepositoryContracts } from './contracts/index.contracts';
 import { ModuleCore } from '../shared/core/moduleCore/module.core';
-import { ResultBuilderContract } from 'src/shared/core/contracts/contracts.result';
-import { NotificationBuilderContract } from 'src/shared/core/contracts/contracts.notification';
+import { ResultBuilderContract } from '../shared/core/contracts/contracts.result';
+import { NotificationBuilderContract } from '../shared/core/contracts/contracts.notification';
 import { Category } from './entity/category.entity';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { CategoryService } from './service/category.service';
@@ -21,7 +21,7 @@ import { CategoryService } from './service/category.service';
         notification: () => NotificationBuilderContract,
         category: Category,
       ) => {
-        return new CategoryBuilder(result(), notification(), category);
+        return () => new CategoryBuilder(result(), notification(), category);
       },
       inject: [ResultBuilderContract, NotificationBuilderContract],
     },

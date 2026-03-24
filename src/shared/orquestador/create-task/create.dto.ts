@@ -1,16 +1,18 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, MaxLength } from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
   @IsNotEmpty()
   titleTask: string;
   @IsString()
-  @IsNotEmpty()
+  @MinLength(0)
+  @MaxLength(255)
   descriptionTask: string;
   @IsString()
   @IsNotEmpty()
   titleCategory: string;
   @IsString()
-  @IsNotEmpty()
+  @MinLength(0)
+  @MaxLength(255)
   descriptionCategory: string;
 }

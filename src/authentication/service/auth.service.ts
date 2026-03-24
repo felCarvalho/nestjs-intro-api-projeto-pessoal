@@ -194,11 +194,7 @@ export class AuthService {
     const notification = this.notification();
     const result = this.result();
 
-    console.log(payload, 'payload bruto');
-
     const { exp, iat, ...payloadRest } = payload;
-
-    console.log(payloadRest, 'desestruturação');
 
     const token = await this.baseAuth.generateToken(payloadRest);
 
@@ -219,8 +215,6 @@ export class AuthService {
 
     const decodeToken = await this.baseAuth.decodeToken(token);
 
-    console.log(decodeToken, 'decodeToken');
-
     return {
       token: token,
       payload: decodeToken,
@@ -229,8 +223,6 @@ export class AuthService {
   async createRefreshToken(payload: payload, idUser: string) {
     const notification = this.notification();
     const result = this.result();
-
-    console.log(payload, 'payload notification');
 
     if (!payload || !idUser) {
       notification

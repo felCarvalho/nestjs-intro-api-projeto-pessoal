@@ -47,7 +47,7 @@ export class TasksBuilder
     return this;
   }
 
-  setCompleted(completed: 'Incompleta' | 'Concluida') {
+  setCompleted(completed: 'Incompleta' | 'Concluída') {
     if (!completed) {
       this.notification
         .setType('ERROR')

@@ -20,35 +20,38 @@ export class CreateTaskOrquestrador {
   ) {}
 
   async syncCategoryAndTasks(createTasksDto: CreateTaskDto, idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
     if (!idUser) {
-      this.notification()
+      notification
         .setType('ERROR')
         .setMessage('Ops! id de usuário inválido')
         .add();
 
-      this.result()
+      result
         .setCode(400)
-        .setNotification(this.notification().build())
+        .setNotification(notification.build())
         .setSuccess(false);
 
-      throw new NotificationException(this.result().build());
+      throw new NotificationException(result.build());
     }
 
     return await this.transaction.runTransaction(async () => {
       const findUser = await this.userRepo.findById(idUser);
 
       if (!findUser) {
-        this.notification()
+        notification
           .setType('ERROR')
           .setMessage('Ops! Seu usuário não foi encontrado')
           .add();
 
-        this.result()
+        result
           .setCode(404)
-          .setNotification(this.notification().build())
+          .setNotification(notification.build())
           .setSuccess(false);
 
-        throw new NotificationException(this.result().build());
+        throw new NotificationException(result.build());
       }
 
       const categoryCreated = await this.categoryService.createCategory(
@@ -57,40 +60,38 @@ export class CreateTaskOrquestrador {
       );
 
       if (!categoryCreated) {
-        this.notification()
+        notification
           .setType('ERROR')
           .setMessage('Ops! Não conseguimos criar sua tasks')
           .add();
 
-        this.result()
+        result
           .setCode(400)
-          .setNotification(this.notification().build())
+          .setNotification(notification.build())
           .setSuccess(false);
 
-        throw new NotificationException(this.result().build());
+        throw new NotificationException(result.build());
       }
 
-      const taskCreated = await this.taskService.createTask(
+      const taskCreated = await this.taskService.createRotina(
         { ...createTasksDto },
         { ...categoryCreated.data },
         findUser,
       );
 
       if (!taskCreated) {
-        this.notification()
+        notification
           .setType('ERROR')
           .setMessage('Ops! Não conseguimos criar sua tasks')
           .add();
 
-        this.result()
+        result
           .setCode(400)
-          .setNotification(this.notification().build())
+          .setNotification(notification.build())
           .setSuccess(false);
 
-        throw new NotificationException(this.result().build());
+        throw new NotificationException(result.build());
       }
-
-      return taskCreated.data;
     });
   }
 }
