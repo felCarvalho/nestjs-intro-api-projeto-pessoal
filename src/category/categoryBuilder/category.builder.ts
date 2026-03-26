@@ -36,12 +36,6 @@ export class CategoryBuilder
   }
 
   setDescription(description: string) {
-    if (!description) {
-      this.notification
-        .setType('ERROR')
-        .setMessage('Ops! erro ao validar a descrição')
-        .add();
-    }
     this.category.description = description;
     return this;
   }

@@ -37,12 +37,6 @@ export class TasksBuilder
   }
 
   setDescription(description: string) {
-    if (!description) {
-      this.notification
-        .setType('ERROR')
-        .setMessage('Ops, erro ao validar a descrição da task')
-        .add();
-    }
     this.task.description = description;
     return this;
   }

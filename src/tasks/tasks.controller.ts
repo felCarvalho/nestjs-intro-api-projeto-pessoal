@@ -12,7 +12,6 @@ import { TasksService } from './service/task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { User } from '../shared/core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
-import { CreateTaskDto } from './dto/create-task.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('home')
@@ -26,9 +25,17 @@ export class TasksController {
     return allTasks;
   }
 
-  @Post()
-  async createTask(@User() user: { sub: string }) {
-    //return await this.tasksService.createTask(createTaskDto);
+  @Post('criar-tarefa')
+  async createTask(
+    @User() user: { sub: string },
+    @Body() task: { titleTask: string; descriptionTask: string },
+  ) {
+    return await this.tasksService.createTask({
+      task: {
+        ...task,
+      },
+      user: user.sub,
+    });
   }
 
   @Post('buscar/:search')
@@ -39,7 +46,6 @@ export class TasksController {
     },
     @Param('search') search: string,
   ) {
-    console.log(user.sub, search);
     const task = await this.tasksService.taskSearch({
       idUser: user.sub,
       search,
@@ -54,7 +60,6 @@ export class TasksController {
     @User() user: { sub: string },
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
-    console.log(updateTaskDto, 'ops, estamos vendo o valo de dto de update');
     return await this.tasksService.taskUpdate({
       ...updateTaskDto,
       idTask: id,

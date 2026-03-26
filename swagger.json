@@ -41,7 +41,9 @@
         "tags": [
           "Tasks"
         ]
-      },
+      }
+    },
+    "/home/criar-tarefa": {
       "post": {
         "operationId": "TasksController_createTask",
         "parameters": [],
@@ -129,6 +131,30 @@
         },
         "tags": [
           "Tasks"
+        ]
+      }
+    },
+    "/home/adicionar-categoria": {
+      "post": {
+        "operationId": "CategoryController_createdCategory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
         ]
       }
     },
@@ -239,6 +265,21 @@
           "idUser",
           "idTask",
           "deleted"
+        ]
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "titleCategory": {
+            "type": "string"
+          },
+          "descriptionCategory": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "titleCategory",
+          "descriptionCategory"
         ]
       },
       "CreateTaskDto": {

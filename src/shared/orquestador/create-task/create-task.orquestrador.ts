@@ -54,12 +54,13 @@ export class CreateTaskOrquestrador {
         throw new NotificationException(result.build());
       }
 
-      const categoryCreated = await this.categoryService.createCategory(
-        { ...createTasksDto },
-        findUser,
-      );
+      const categoryCreated =
+        await this.categoryService.createCategoryTransaction(
+          { ...createTasksDto },
+          findUser,
+        );
 
-      if (!categoryCreated) {
+      if (!categoryCreated.success) {
         notification
           .setType('ERROR')
           .setMessage('Ops! Não conseguimos criar sua tasks')

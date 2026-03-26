@@ -8,9 +8,10 @@ import { Tasks } from '../entity/tasks.entity';
 import { NotificationException } from '../../shared/core/@custom-decorators/exception-custom/exception';
 import { PersistContract } from '../../shared/core/contracts/contracts.persistence';
 import { User } from '../../users/entity/user.entity';
-import { Category } from 'src/category/entity/category.entity';
+import { Category } from '../../category/entity/category.entity';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import { UserRepositoryContract } from '../../users/contracts/index.contract';
 
 export class TasksService {
   constructor(
@@ -19,6 +20,7 @@ export class TasksService {
     private readonly result: () => ResultBuilderContract<Tasks | Tasks[]>,
     private readonly taskRepo: TaskRepositoryContract<Tasks>,
     private readonly taskBuilder: () => TaskBuilderContract<Tasks>,
+    private readonly userRepo: UserRepositoryContract<User>,
   ) {}
 
   verifyMaxLength(data: string, maxLength: number) {
@@ -37,7 +39,10 @@ export class TasksService {
     return false;
   }
 
-  async creataskCore(task: CreateTaskDto, user: User) {
+  async createTaskCore(
+    task: { titleTask: string; descriptionTask: string },
+    user: User,
+  ) {
     const notification = this.notification();
     const result = this.result();
 
@@ -75,13 +80,11 @@ export class TasksService {
         .setMessage('Ops! Essa rotina já existe')
         .add();
 
-      const data = result
+      return result
         .setCode(409)
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
-      throw new NotificationException(data);
     }
 
     if (this.verifyMaxLength(task.titleTask, 255)) {
@@ -105,7 +108,7 @@ export class TasksService {
         .add();
     }
 
-    if (notification.verifyWarnings()) {
+    if (notification.verifyWarnings() || notification.verifyErrors()) {
       return result
         .setCode(404)
         .setNotification(notification.build())
@@ -119,8 +122,8 @@ export class TasksService {
   async createRotina(task: CreateTaskDto, category: Category, user: User) {
     const notification = this.notification();
     const result = this.result();
-    const verifyTasksCreated = await this.creataskCore(task, user);
 
+    const verifyTasksCreated = await this.createTaskCore(task, user);
     if (!verifyTasksCreated?.success) {
       throw new NotificationException(verifyTasksCreated);
     }
@@ -154,14 +157,9 @@ export class TasksService {
     const taskBuild = taskBuilder.build();
 
     if (!taskBuild.success) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, tivemos um problema ao criar sua rotina')
-        .add();
-
       const data = result
         .setCode(400)
-        .setNotification(notification.build())
+        .setNotification(taskBuild.notification)
         .setSuccess(false)
         .build();
 
@@ -172,12 +170,32 @@ export class TasksService {
     return taskBuild.data;
   }
 
-  async createTask(task: CreateTaskDto, user: User) {
+  async createTask({
+    task,
+    user,
+  }: {
+    task: { titleTask: string; descriptionTask: string };
+    user: string;
+  }) {
     const notification = this.notification();
     const result = this.result();
 
-    const verifyTasksCreated = await this.creataskCore(task, user);
-    if (!verifyTasksCreated.success) {
+    const findUser = await this.userRepo.findById(user);
+
+    if (!findUser) {
+      notification.setType('ERROR').setMessage('Usuário não encontrado').add();
+
+      const data = result
+        .setCode(404)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    const verifyTasksCreated = await this.createTaskCore(task, findUser);
+    if (!verifyTasksCreated?.success) {
       throw new NotificationException(verifyTasksCreated);
     }
 
@@ -187,13 +205,42 @@ export class TasksService {
     taskBuilder.generateId();
     taskBuilder.setTitle(task.titleTask);
     taskBuilder.setDescription(task.descriptionTask);
-    taskBuilder.setUser(user);
+    taskBuilder.setUser(findUser);
     taskBuilder.setCreateDate(date);
     taskBuilder.setUpdateDate(date);
     taskBuilder.setCompleted('Incompleta');
     const taskBuild = taskBuilder.build();
 
     if (!taskBuild.success) {
+      const data = result
+        .setCode(400)
+        .setNotification(taskBuild.notification)
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    this.taskRepo.createTask(taskBuild.data);
+
+    try {
+      await this.persist.commit();
+
+      notification
+        .setType('INFO')
+        .setMessage('Opa, sua tarefa foi criada')
+        .add();
+
+      const data = result
+        .setCode(200)
+        .setData(taskBuild.data)
+        .setNotification(notification.build())
+        .setSuccess(true)
+        .build();
+
+      return data;
+    } catch (error) {
+      console.error(error);
       notification
         .setType('ERROR')
         .setMessage('Ops, Não conseguimos criar sua tarefa')
@@ -207,17 +254,6 @@ export class TasksService {
 
       throw new NotificationException(data);
     }
-
-    notification.setType('INFO').setMessage('Opa, sua tarefa foi criada').add();
-
-    const data = result
-      .setCode(200)
-      .setData(taskBuild.data)
-      .setNotification(notification.build())
-      .setSuccess(true)
-      .build();
-
-    return data;
   }
 
   async updateTasksTitle(task: UpdateTaskDto) {

@@ -1,7 +1,6 @@
 import { EntityRepository } from '@mikro-orm/postgresql';
 import { Tasks } from '../entity/tasks.entity';
 import { TaskRepositoryContract } from '../contracts/index.contracts';
-import { wrap } from '@mikro-orm/core';
 
 export class TasksRepository
   extends EntityRepository<Tasks>

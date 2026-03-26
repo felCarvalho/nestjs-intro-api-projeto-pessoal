@@ -9,10 +9,15 @@ import { NotificationBuilderContract } from '../shared/core/contracts/contracts.
 import { Category } from './entity/category.entity';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { CategoryService } from './service/category.service';
+import { UsersModule } from '../users/users.module';
+import { UserRepositoryContract } from '../users/contracts/index.contract';
+import { User } from '../users/entity/user.entity';
+import { CategoryController } from './category.controller';
+import { PersistContract } from '../shared/core/contracts/contracts.persistence';
 
 @Module({
-  imports: [ModuleCore],
-  controllers: [],
+  imports: [ModuleCore, UsersModule],
+  controllers: [CategoryController],
   providers: [
     {
       provide: CategoryBuilderContracts,
@@ -39,12 +44,16 @@ import { CategoryService } from './service/category.service';
         result: () => ResultBuilderContract<Category>,
         categoryRepo: CategoryRepositoryContracts<Category>,
         categoryBuilder: () => CategoryBuilderContracts<Category>,
+        userRepo: UserRepositoryContract<User>,
+        persist: PersistContract<Category>,
       ) => {
         return new CategoryService(
           notification,
           result,
           categoryRepo,
           categoryBuilder,
+          userRepo,
+          persist,
         );
       },
       inject: [
@@ -52,6 +61,8 @@ import { CategoryService } from './service/category.service';
         ResultBuilderContract,
         CategoryRepositoryContracts,
         CategoryBuilderContracts,
+        UserRepositoryContract,
+        PersistContract,
       ],
     },
   ],
