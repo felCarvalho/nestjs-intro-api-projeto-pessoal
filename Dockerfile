@@ -23,15 +23,18 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copia as dependências e o build do estágio anterior
-COPY --from=builder /app/package*.json ./
+# Copia apenas os arquivos necessários para instalar dependências de produção
+COPY package*.json ./
+
+# Instala apenas dependências de produção para reduzir o tamanho da imagem
+RUN npm install --omit=dev --legacy-peer-deps
+
+# Copia o build e as migrations do estágio anterior
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-# Se houver outros arquivos necessários em runtime, como as migrations do MikroORM se não estiverem no dist
 COPY --from=builder /app/src/migrations ./src/migrations
 
-# Exponha a porta que o NestJS usa
+# Exponha a porta
 EXPOSE 3000
 
-# Comando para iniciar a aplicação
-CMD ["npm", "run", "start:prod"]
+# Comando para iniciar a aplicação (tentando localizar o main.js)
+CMD ["sh", "-c", "if [ -f dist/src/main.js ]; then node dist/src/main.js; else node dist/main.js; fi"]
