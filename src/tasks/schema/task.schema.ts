@@ -25,7 +25,7 @@ export const taskSchema = new EntitySchema<Tasks>({
       default: null,
       nullable: true,
     },
-    completed: { type: 'string' },
+    completed: { type: 'string', length: 255 },
     status: { type: 'string', nullable: true, default: null },
     updateAt: { type: 'timestamptz', defaultRaw: 'now()' },
     createAt: { type: 'timestamptz', defaultRaw: 'now()' },
