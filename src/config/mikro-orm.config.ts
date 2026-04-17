@@ -13,11 +13,14 @@ import { RolesPermissionsSchema } from '../authorization/schema/rolesPermissons.
 import { categorySchema } from '../category/schema/category.schema';
 import { taskSchema } from '../tasks/schema/task.schema';
 import { loadEnvFile } from 'node:process';
+import { existsSync } from 'node:fs';
 
-try {
-  loadEnvFile('.env');
-} catch (error) {
-  console.error('Error loading environment variables:', error);
+if (existsSync('.env')) {
+  try {
+    loadEnvFile('.env');
+  } catch (error) {
+    // Silencioso em produção/docker
+  }
 }
 
 export default defineConfig({
