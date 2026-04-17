@@ -36,8 +36,13 @@ import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/de
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: () => ({
+      useFactory: (configService: ConfigService) => ({
         ...defineConfig,
+        dbName: configService.get<string>('DATABASE'),
+        user: configService.get<string>('DB_USER'),
+        password: configService.get<string>('DB_PASSWORD'),
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
         autoLoadEntities: true,
       }),
       driver: PostgreSqlDriver,
