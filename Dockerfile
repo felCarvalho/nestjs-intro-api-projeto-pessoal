@@ -26,17 +26,15 @@ WORKDIR /app
 # Copia apenas os arquivos necessários para instalar dependências de produção
 COPY package*.json ./
 
-# Instala apenas dependências de produção (incluindo ts-node que movemos para dependencies)
+# Instala apenas dependências de produção (não precisa de typescript nem ts-node)
 RUN npm install --omit=dev --legacy-peer-deps
 
-# Copia o build, o código fonte e a configuração do TS necessária para o MikroORM rodar em modo TS
+# Copia o build pronto (inclui código e migrations compiladas)
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/src ./src
-COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 # Exponha a porta
 EXPOSE 3000
 
-# Comando para rodar migrações e iniciar a aplicação usando o script definido no package.json
+# Comando para rodar migrações e iniciar a aplicação usando o JS compilado
 # No Railway, isso será chamado automaticamente
 CMD ["npm", "run", "deploy"]
