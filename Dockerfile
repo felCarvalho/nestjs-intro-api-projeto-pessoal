@@ -29,9 +29,10 @@ COPY package*.json ./
 # Instala apenas dependências de produção (incluindo ts-node que movemos para dependencies)
 RUN npm install --omit=dev --legacy-peer-deps
 
-# Copia o build e o código fonte necessário para o MikroORM rodar em modo TS
+# Copia o build, o código fonte e a configuração do TS necessária para o MikroORM rodar em modo TS
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
 
 # Exponha a porta
 EXPOSE 3000
