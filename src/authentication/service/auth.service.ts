@@ -103,6 +103,7 @@ export class AuthService {
 
     const findIdentifier = await this.credentialsRepo.findIdentifier(
       verifyCredentials.data.identifier,
+      verifyCredentials.data.user.id,
     );
 
     if (!findIdentifier) {
@@ -400,8 +401,10 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const findCredentials =
-      await this.credentialsRepo.findIdentifier(identifier);
+    const findCredentials = await this.credentialsRepo.findIdentifier(
+      identifier,
+      idUser,
+    );
 
     if (!findCredentials) {
       notification
@@ -433,7 +436,7 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const findToken = await this.refreshRepo.findById(idToken);
+    const findToken = await this.refreshRepo.findById(idToken, idUser);
 
     if (!findToken) {
       notification.setType('ERROR').setMessage('Ops! Token inválido').add();
@@ -482,8 +485,10 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const findCredentials =
-      await this.credentialsRepo.findIdentifier(identifier);
+    const findCredentials = await this.credentialsRepo.findIdentifier(
+      identifier,
+      user.id,
+    );
 
     if (findCredentials) {
       notification

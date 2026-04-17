@@ -1,11 +1,10 @@
-import { IUser } from '../../shared/core/types/types';
 import { ResultData } from '../../shared/core/result/result';
 import { HashContract } from '../../shared/core/contracts/contracts.hash';
 
 export abstract class RefreshTokenRepositoryContract<T> {
-  abstract findById(id: string): Promise<T | null>;
-  abstract findAllId(id: string): Promise<T[]>;
-  abstract findUserById(id: string): Promise<T | null>;
+  abstract findById(id: string, idUser: string): Promise<T | null>;
+  abstract findAllId(id: string, idUser: string): Promise<T[]>;
+  abstract findUserById(idUser: string): Promise<T | null>;
   abstract createRefreshToken(token: T): void;
 }
 
