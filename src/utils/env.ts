@@ -1,9 +1,12 @@
 import { loadEnvFile } from 'node:process';
+import { existsSync } from 'node:fs';
 
 export function loadEnvFileFN() {
-  try {
-    return loadEnvFile('.env');
-  } catch (error) {
-    console.error('Error loading environment variables:', error);
+  if (existsSync('.env')) {
+    try {
+      return loadEnvFile('.env');
+    } catch (error) {
+      // Silencioso
+    }
   }
 }
