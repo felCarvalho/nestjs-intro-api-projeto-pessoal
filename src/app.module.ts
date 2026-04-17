@@ -12,19 +12,27 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { UsersModule } from './users/users.module';
 import { TasksModule } from './tasks/tasks.module';
 import { CategoryModule } from './category/category.module';
-import { CreateTaskOrquestradorModule } from './shared/orquestador/create-task/create-task.module';
+import { CreateRotinaOrquestradorModule } from './shared/orquestador/create-rotina/create-rotina.module';
 import { CreateUserOrquestradorModule } from './shared/orquestador/create-user/create-user.module';
 import { AuthModule } from './authentication/auth.module';
+import { GetAllTaskCategoryRascunhoModule } from './shared/orquestador/get-all-task-category-rascunho/get-all-task-category-rascunho.module';
+import { GetAllTaskCategoryActiveOrquestrador } from './shared/orquestador/get-all-task-category-active/get-all-task-category-active.orquestrador';
+import { UpdateCategoryTaskOrquestradorModule } from './shared/orquestador/update-status-category-task/update-status-category-task.module';
+import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/delete-all-category-task/delete-all-category-task.module';
 
 @Module({
   imports: [
     UsersModule,
     TasksModule,
     CategoryModule,
-    CreateTaskOrquestradorModule,
+    CreateRotinaOrquestradorModule,
     CreateUserOrquestradorModule,
     AuthModule,
-    ConfigModule.forRoot({ cache: true, isGlobal: true }),
+    GetAllTaskCategoryRascunhoModule,
+    UpdateCategoryTaskOrquestradorModule,
+    DeleteAllCategoryTaskOrquestradorModule,
+    GetAllTaskCategoryActiveOrquestrador,
+    ConfigModule.forRoot({ isGlobal: true }),
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

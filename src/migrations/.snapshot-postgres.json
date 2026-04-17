@@ -705,6 +705,17 @@
           "nullable": false,
           "mappedType": "uuid"
         },
+        "status": {
+          "name": "status",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "default": "null",
+          "mappedType": "string"
+        },
         "update_at": {
           "name": "update_at",
           "type": "timestamptz",
@@ -742,16 +753,6 @@
       "name": "categories",
       "schema": "public",
       "indexes": [
-        {
-          "columnNames": [
-            "title"
-          ],
-          "composite": false,
-          "keyName": "categories_title_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
         {
           "keyName": "categories_pkey",
           "columnNames": [
@@ -827,7 +828,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "default": "null",
           "mappedType": "uuid"
         },
@@ -839,6 +840,17 @@
           "primary": false,
           "nullable": false,
           "length": 255,
+          "mappedType": "string"
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "default": "null",
           "mappedType": "string"
         },
         "update_at": {
@@ -923,6 +935,7 @@
             "id"
           ],
           "referencedTableName": "public.categories",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },

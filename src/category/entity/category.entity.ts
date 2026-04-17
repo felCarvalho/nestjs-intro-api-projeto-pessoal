@@ -5,4 +5,5 @@ export class Category extends baseEntity {
   title: string;
   description: string;
   user: IUser;
+  status: string;
 }

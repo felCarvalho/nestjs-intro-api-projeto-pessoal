@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { TasksService } from './service/task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { User } from '../shared/core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
-import { CreateTaskDto } from './dto/create-task.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('home')
@@ -21,14 +21,27 @@ export class TasksController {
 
   @Get()
   async getAllTasks(@User() user: { sub: string }) {
-    const allTasks = await this.tasksService.findAllTasks(user.sub);
-
-    return allTasks;
+    return await this.tasksService.findAllTasks(user.sub);
   }
 
-  @Post()
-  async createTask(@User() user: { sub: string }) {
-    //return await this.tasksService.createTask(createTaskDto);
+  @Get('detalhes/:id')
+  async getTaskById(@Param('id') id: string, @User() user: { sub: string }) {
+    return await this.tasksService.findTasks(user.sub, id);
+  }
+
+  @Post('criar-tarefa')
+  async createTask(
+    @User() user: { sub: string },
+    @Body() createTaskDto: CreateTaskDto,
+  ) {
+    const data = await this.tasksService.createTask({
+      task: {
+        ...createTaskDto,
+      },
+      user: user.sub,
+    });
+
+    return data;
   }
 
   @Post('buscar/:search')
@@ -39,7 +52,6 @@ export class TasksController {
     },
     @Param('search') search: string,
   ) {
-    console.log(user.sub, search);
     const task = await this.tasksService.taskSearch({
       idUser: user.sub,
       search,
@@ -54,7 +66,6 @@ export class TasksController {
     @User() user: { sub: string },
     @Body() updateTaskDto: UpdateTaskDto,
   ) {
-    console.log(updateTaskDto, 'ops, estamos vendo o valo de dto de update');
     return await this.tasksService.taskUpdate({
       ...updateTaskDto,
       idTask: id,

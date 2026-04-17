@@ -1,12 +1,3 @@
-/*export type ICredentials = {
-  identifier: string;
-  provide: string;
-  user: IUser;
-  deleterAt: string;
-  updatedAt: string;
-  createdAt: string;
-};*/
-
 export type IUser = {
   id: string;
   name: string;
@@ -63,6 +54,7 @@ export type ICategory = {
   title: string;
   description: string;
   user: IUser;
+  status: string;
   createAt: string;
   deleteAt: string | null;
   updateAt: string;

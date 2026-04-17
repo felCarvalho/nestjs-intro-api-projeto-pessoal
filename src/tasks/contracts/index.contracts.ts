@@ -14,10 +14,18 @@ export abstract class TaskRepositoryContract<T> {
   abstract findById: (id: string) => Promise<T | null>;
   abstract findByIdDeleted: (id: string) => Promise<T | null>;
   abstract findAllBy: (id: string) => Promise<T[]>;
+  abstract findByIdRascunhos: (id: string) => Promise<T | null>;
   abstract findTitle: (name: string) => Promise<T | null>;
   abstract findAllTasksUser: (id: string) => Promise<T[]>;
   abstract createTask(task: Tasks): void;
   abstract searchTask(query: string, idUser: string): Promise<T[]>;
+  abstract findAllRascunhos: (idUser: string) => Promise<T[]>;
+  abstract allUpdateTasks(
+    idUser: string,
+    idCategory: string,
+    completed: string,
+  ): Promise<number>;
+  abstract deleteAllTasks(idCategory: string, idUser: string): Promise<number>;
 }
 
 export abstract class TaskBuilderContract<T> {
@@ -29,6 +37,7 @@ export abstract class TaskBuilderContract<T> {
   abstract setUser(user: IUser): this;
   abstract setUpdateDate(date: string): this;
   abstract setDeleteDate(date: string): this;
+  abstract setStatus(status: 'Ativa' | 'Inativa'): this;
   abstract generateId(): this;
   abstract build(): ResultContract<T>;
 }

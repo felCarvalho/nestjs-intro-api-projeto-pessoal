@@ -16,6 +16,8 @@ import { TasksService } from './service/task.service';
 import { TasksBuilder } from './tasksBuilder/tasks.builder';
 import { AuthModule } from '../authentication/auth.module';
 import { TasksController } from './tasks.controller';
+import { UserRepositoryContract } from 'src/users/contracts/index.contract';
+import { User } from '../users/entity/user.entity';
 
 @Module({
   imports: [ModuleCore, CategoryModule, UsersModule, AuthModule],
@@ -42,11 +44,12 @@ import { TasksController } from './tasks.controller';
     {
       provide: TasksService,
       useFactory: (
-        persist: PersistContract<any>,
+        persist: PersistContract<Tasks>,
         notification: () => NotificationBuilderContract,
         result: () => ResultBuilderContract<any>,
         tasksRepo: TaskRepositoryContract<Tasks>,
         taskBuilder: () => TaskBuilderContract<Tasks>,
+        userRepo: UserRepositoryContract<User>,
       ) => {
         return new TasksService(
           persist,
@@ -54,6 +57,7 @@ import { TasksController } from './tasks.controller';
           result,
           tasksRepo,
           taskBuilder,
+          userRepo,
         );
       },
       inject: [
@@ -62,6 +66,7 @@ import { TasksController } from './tasks.controller';
         ResultBuilderContract,
         TaskRepositoryContract,
         TaskBuilderContract,
+        UserRepositoryContract,
       ],
     },
   ],

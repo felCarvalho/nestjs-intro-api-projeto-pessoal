@@ -6,6 +6,11 @@ export abstract class CategoryRepositoryContracts<T> {
   abstract findAllId(id: string): Promise<T[]>;
   abstract findTitle(title: string): Promise<T | null>;
   abstract createCategory(category: ICategory): void;
+  abstract findAllRascunhos(idUser: string): Promise<T[]>;
+  abstract findByIds(id: string[]): Promise<T[]>;
+  abstract findDeletedCategory(): Promise<T[]>;
+  abstract findByIdRascunhos(id: string, idUser: string): Promise<T | null>;
+  abstract findAllByUserId(idUser: string): Promise<T[]>;
 }
 
 export abstract class CategoryBuilderContracts<T> {
@@ -15,6 +20,7 @@ export abstract class CategoryBuilderContracts<T> {
   abstract setCreateDate(date: string): this;
   abstract generateId(): this;
   abstract setDescription(description: string): this;
+  abstract setStatus(status: 'Ativa' | 'Inativa'): this;
   abstract setUpdateDate(date: string): this;
   abstract setDeleteDate(date: string): this;
 }

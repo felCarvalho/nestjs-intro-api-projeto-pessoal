@@ -5,11 +5,12 @@ import { NotificationBuilderContract } from '../../core/contracts/contracts.noti
 import { ResultBuilderContract } from '../../core/contracts/contracts.result';
 import { Tasks } from '../../../tasks/entity/tasks.entity';
 import { TransactionContract } from '../../core/contracts/contracts.transaction';
-import { CreateTaskDto } from './create.dto';
+import { CreateRotinaDto } from './create-rotina.dto';
 import { UserRepositoryContract } from '../../../users/contracts/index.contract';
 import { User } from '../../../users/entity/user.entity';
+import { Category } from '../../../category/entity/category.entity';
 
-export class CreateTaskOrquestrador {
+export class CreateRotinaOrquestrador {
   constructor(
     private readonly categoryService: CategoryService,
     private readonly taskService: TasksService,
@@ -19,7 +20,7 @@ export class CreateTaskOrquestrador {
     private readonly userRepo: UserRepositoryContract<User>,
   ) {}
 
-  async syncCategoryAndTasks(createTasksDto: CreateTaskDto, idUser: string) {
+  async syncCategoryAndTasks(createRotinaDto: CreateRotinaDto, idUser: string) {
     const notification = this.notification();
     const result = this.result();
 
@@ -54,12 +55,13 @@ export class CreateTaskOrquestrador {
         throw new NotificationException(result.build());
       }
 
-      const categoryCreated = await this.categoryService.createCategory(
-        { ...createTasksDto },
-        findUser,
-      );
+      const categoryCreated =
+        await this.categoryService.createCategoryTransaction(
+          { ...createRotinaDto },
+          findUser,
+        );
 
-      if (!categoryCreated) {
+      if (!categoryCreated.success) {
         notification
           .setType('ERROR')
           .setMessage('Ops! Não conseguimos criar sua tasks')
@@ -74,8 +76,8 @@ export class CreateTaskOrquestrador {
       }
 
       const taskCreated = await this.taskService.createRotina(
-        { ...createTasksDto },
-        { ...categoryCreated.data },
+        createRotinaDto,
+        categoryCreated.data as Category,
         findUser,
       );
 

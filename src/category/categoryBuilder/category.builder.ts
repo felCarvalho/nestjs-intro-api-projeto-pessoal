@@ -36,13 +36,19 @@ export class CategoryBuilder
   }
 
   setDescription(description: string) {
-    if (!description) {
+    this.category.description = description;
+    return this;
+  }
+
+  setStatus(status: 'Ativa' | 'Inativa') {
+    if (!status) {
       this.notification
         .setType('ERROR')
-        .setMessage('Ops! erro ao validar a descrição')
+        .setMessage('Ops! erro ao validar o status')
         .add();
     }
-    this.category.description = description;
+
+    this.category.status = status;
     return this;
   }
 

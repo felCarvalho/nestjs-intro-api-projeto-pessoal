@@ -1,53 +1,21 @@
 import { NotificationException } from '../../shared/core/@custom-decorators/exception-custom/exception';
-import {
-  CredentialsBuilderContracts,
-  CredentialsRepositoryContract,
-} from '../../authentication/contracts/credentials.contracts';
-import {
-  PassHashBuilderContracts,
-  PassHashRepositoryContract,
-} from '../../authentication/contracts/passHash.contract';
-import { RolesRepositoryContract } from '../../authentication/contracts/roles.contracts';
-import {
-  UserRolesBuilderContract,
-  UserRolesRepositoryContract,
-} from '../../authentication/contracts/userRoules.contracts';
 import { NotificationBuilderContract } from '../../shared/core/contracts/contracts.notification';
-import { PersistContract } from '../../shared/core/contracts/contracts.persistence';
 import { ResultBuilderContract } from '../../shared/core/contracts/contracts.result';
-import { TransactionContract } from '../../shared/core/contracts/contracts.transaction';
-import {
-  ICredentials,
-  IPassHash,
-  IRoles,
-  IUserRoles,
-} from '../../shared/core/types/types';
 import {
   UserCreateBuilderContract,
   UserRepositoryContract,
 } from '../contracts/index.contract';
-//import { CreateUserDto } from '../dto/create-user.dto';
-//import { UpdateUserDto } from '../dto/update-user.dto';
 import { User } from '../entity/user.entity';
 
 export class UsersService {
   constructor(
-    private readonly persister: PersistContract<any>,
     private readonly userRepo: UserRepositoryContract<User>,
-    private readonly transaction: TransactionContract,
-    private readonly credentialsRepo: CredentialsRepositoryContract<ICredentials>,
-    private readonly passHashRepo: PassHashRepositoryContract<IPassHash>,
-    private readonly userRolesRepo: UserRolesRepositoryContract<IUserRoles>,
-    private readonly passHashBuilder: () => PassHashBuilderContracts<IPassHash>,
-    private readonly credentialsBuilder: () => CredentialsBuilderContracts<ICredentials>,
     private readonly userBuilder: () => UserCreateBuilderContract<User>,
-    private readonly userRolesBuilder: () => UserRolesBuilderContract<IUserRoles>,
-    private readonly roleRepo: RolesRepositoryContract<IRoles>,
     private readonly notification: () => NotificationBuilderContract,
     private readonly result: () => ResultBuilderContract<User>,
   ) {}
 
-  verifyMinLength(data: string) {
+  private verifyMinLength(data: string) {
     const min = 8;
 
     if (data.length < min) {
@@ -57,7 +25,7 @@ export class UsersService {
     return false;
   }
 
-  verifyMaxLength(data: string) {
+  private verifyMaxLength(data: string) {
     const max = 150;
 
     if (data.length > max) {
@@ -152,5 +120,45 @@ export class UsersService {
     this.userRepo.createUser(data.data);
     console.log('use rodou');
     return data;
+  }
+
+  async findUserById(id: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!id) {
+      notification.setType('ERROR').setMessage('Ops! ID inválido').add();
+      result
+        .setCode(400)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    const user = await this.userRepo.findById(id);
+
+    if (!user) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Usuário não encontrado')
+        .add();
+
+      result
+        .setCode(404)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    return result
+      .setCode(200)
+      .setData(user)
+      .setNotification(notification.build())
+      .setSuccess(true)
+      .build();
   }
 }
