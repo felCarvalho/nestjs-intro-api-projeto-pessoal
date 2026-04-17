@@ -41,7 +41,7 @@ export default defineConfig({
   driver: PostgreSqlDriver,
   migrations: {
     tableName: 'minhas-migrations',
-    path: './dist/migrations',
+    path: './dist/src/migrations',
     pathTs: './src/migrations',
     glob: '*.{js,ts}',
     silent: false,
@@ -55,8 +55,8 @@ export default defineConfig({
     fileName: (timestamp, name) => `${timestamp}_${name || 'migration'}`,
   },
   seeder: {
-    path: './seeders',
-    pathTs: './seeders',
+    path: './dist/src/seeders',
+    pathTs: './src/seeders',
     defaultSeeder: 'DatabaseSeeder',
     glob: '!(*.d).{js,ts}',
     emit: 'ts',
