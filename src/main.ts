@@ -15,6 +15,7 @@ async function bootstrap() {
     origin: [
       configService.get<string>('LOCALHOST_CLIENT'),
       configService.get<string>('LOCALHOST_NGROK'),
+      configService.get<string>('LOCALHOST_PRODUCTION'),
     ].filter(Boolean),
     credentials: true,
   });

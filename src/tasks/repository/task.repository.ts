@@ -6,9 +6,9 @@ export class TasksRepository
   extends EntityRepository<Tasks>
   implements TaskRepositoryContract<Tasks>
 {
-  async findById(id: string) {
+  async findById(id: string, iduser: string) {
     return await this.findOne(
-      { id },
+      { id, user: { id: iduser } },
       {
         populate: ['category', 'user'],
         filters: {
@@ -31,9 +31,9 @@ export class TasksRepository
     );
   }
 
-  async findByIdRascunhos(id: string) {
+  async findByIdRascunhos(id: string, idUser: string) {
     return await this.findOne(
-      { id },
+      { id, user: { id: idUser } },
       {
         populate: ['category', 'user'],
         filters: {
@@ -45,9 +45,9 @@ export class TasksRepository
     );
   }
 
-  async findByIdDeleted(id: string) {
+  async findByIdDeleted(id: string, idUser: string) {
     return await this.findOne(
-      { id },
+      { id, user: { id: idUser } },
       {
         populate: ['category', 'user'],
         filters: {
@@ -80,9 +80,9 @@ export class TasksRepository
     );
   }
 
-  async findTitle(name: string) {
+  async findTitle(name: string, idUser: string) {
     return await this.findOne(
-      { title: name },
+      { title: name, user: { id: idUser } },
       {
         filters: { isCategory: false },
       },

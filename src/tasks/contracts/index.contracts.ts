@@ -11,11 +11,11 @@ import { User } from '../../users/entity/user.entity';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 
 export abstract class TaskRepositoryContract<T> {
-  abstract findById: (id: string) => Promise<T | null>;
-  abstract findByIdDeleted: (id: string) => Promise<T | null>;
+  abstract findById: (id: string, iduser: string) => Promise<T | null>;
+  abstract findByIdDeleted: (id: string, idUser: string) => Promise<T | null>;
   abstract findAllBy: (id: string) => Promise<T[]>;
-  abstract findByIdRascunhos: (id: string) => Promise<T | null>;
-  abstract findTitle: (name: string) => Promise<T | null>;
+  abstract findByIdRascunhos: (id: string, idUser: string) => Promise<T | null>;
+  abstract findTitle: (name: string, idUser: string) => Promise<T | null>;
   abstract findAllTasksUser: (id: string) => Promise<T[]>;
   abstract createTask(task: Tasks): void;
   abstract searchTask(query: string, idUser: string): Promise<T[]>;

@@ -71,6 +71,7 @@ export class CategoryService {
 
     const findCategory = await this.categoryRepo.findTitle(
       category.titleCategory,
+      user.id,
     );
 
     if (findCategory) {
@@ -256,7 +257,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const findCategory = await this.categoryRepo.findById(categoryId);
+    const findCategory = await this.categoryRepo.findById(categoryId, idUser);
 
     if (!findCategory) {
       notification
@@ -395,7 +396,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const category = await this.categoryRepo.findById(id);
+    const category = await this.categoryRepo.findById(id, idUser);
 
     if (!category) {
       notification
@@ -549,7 +550,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const findCategory = await this.categoryRepo.findById(id);
+    const findCategory = await this.categoryRepo.findById(id, idUser);
 
     if (!findCategory) {
       notification
@@ -653,7 +654,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const findCategory = await this.categoryRepo.findById(id);
+    const findCategory = await this.categoryRepo.findById(id, idUser);
 
     if (!findCategory) {
       notification
@@ -745,7 +746,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const findCategory = await this.categoryRepo.findById(id);
+    const findCategory = await this.categoryRepo.findById(id, idUser);
 
     if (!findCategory) {
       notification
