@@ -15,7 +15,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
-    "deploy": "npx mikro-orm migration:up && node dist/src/main",
+    "deploy": "npx mikro-orm migration:up --config ./dist/src/config/mikro-orm.config.js && node dist/src/main",
     "doc:generate": "ts-node ./doc-swagger.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -28,6 +28,7 @@
     "useTsNode": true,
     "configPaths": [
       "./src/config/mikro-orm.config.ts",
+      "./dist/src/config/mikro-orm.config.js",
       "./mikro-orm.config.ts"
     ]
   },
