@@ -37,7 +37,9 @@ import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/de
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const dbName = configService.get<string>('DATABASE') || configService.get<string>('DB_NAME');
+        const dbName =
+          configService.get<string>('DATABASE') ||
+          configService.get<string>('DB_NAME');
         console.log('Tentando conectar ao banco:', {
           host: configService.get<string>('DB_HOST'),
           dbName,

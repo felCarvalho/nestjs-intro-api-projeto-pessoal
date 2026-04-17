@@ -15,7 +15,8 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/src/main",
-    "deploy": "npx mikro-orm migration:up --config ./dist/src/config/mikro-orm.config.js && node dist/src/main",
+    "deploy": "npx mikro-orm-ts migration:up --config ./src/config/mikro-orm.config.ts && npm run start:prod",
+    "mikro-orm:up": "npx mikro-orm-ts migration:up",
     "doc:generate": "ts-node ./doc-swagger.ts",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
@@ -61,7 +62,8 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "ua-parser-js": "^1.0.41",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -88,7 +90,6 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.20.0"
