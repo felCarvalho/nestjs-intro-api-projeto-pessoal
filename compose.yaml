@@ -1,16 +1,48 @@
 version: '3.8'
 
 services:
-  db:
-    image: postgres:13 # Ou a versão que preferir
+  app:
+    build: .
     ports:
-      - '${DB_PORT}:5432' # Porta do host : Porta do container
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
     environment:
-      POSTGRES_USER: '${DB_USER}'
-      POSTGRES_PASSWORD: '${DB_PASSWORD}'
-      POSTGRES_DB: '${DATABSE}' # O nome do banco que ele vai criar automático
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DATABASE: ${DATABASE}
+      NAME: ${NAME}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      LOCALHOST_CLIENT: ${LOCALHOST_CLIENT}
+      LOCALHOST_NGROK: ${LOCALHOST_NGROK}
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    ports:
+      - '${DB_PORT}:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DATABASE}
     volumes:
-      - pgdata:/var/lib/postgresql/data # Para não perder dados se desligar o container
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DATABASE}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pgdata:
+
+networks:
+  app-network:
+    driver: bridge
