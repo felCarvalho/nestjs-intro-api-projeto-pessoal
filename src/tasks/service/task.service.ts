@@ -72,7 +72,7 @@ export class TasksService {
         .add();
     }
 
-    const findTask = await this.taskRepo.findTitle(task.titleTask);
+    const findTask = await this.taskRepo.findTitle(task.titleTask, user.id);
 
     if (findTask) {
       notification
@@ -294,7 +294,7 @@ export class TasksService {
       throw new NotificationException(resultException);
     }
 
-    const findTasks = await this.taskRepo.findById(task.idTask);
+    const findTasks = await this.taskRepo.findById(task.idTask, task.idUser);
 
     if (!findTasks) {
       notification
@@ -388,7 +388,7 @@ export class TasksService {
       throw new NotificationException(resultException);
     }
 
-    const findTasks = await this.taskRepo.findById(idTask);
+    const findTasks = await this.taskRepo.findById(idTask, idUser);
 
     if (!findTasks) {
       notification
@@ -507,7 +507,7 @@ export class TasksService {
       throw new NotificationException(resultException);
     }
 
-    const findTasks = await this.taskRepo.findById(task.idTask);
+    const findTasks = await this.taskRepo.findById(task.idTask, task.idUser);
 
     if (!findTasks) {
       notification
@@ -615,7 +615,7 @@ export class TasksService {
       throw new NotificationException(resultException);
     }
 
-    const findTasks = await this.taskRepo.findById(task.idTask);
+    const findTasks = await this.taskRepo.findById(task.idTask, task.idUser);
 
     if (!findTasks) {
       notification
@@ -704,7 +704,7 @@ export class TasksService {
         .add();
     }
 
-    const findTasks = await this.taskRepo.findById(idTasks);
+    const findTasks = await this.taskRepo.findById(idTasks, idUser);
 
     if (findTasks && findTasks?.user.id !== idUser) {
       notification
@@ -849,15 +849,15 @@ export class TasksService {
   }
 
   async taskUpdate(task: UpdateTaskDto) {
-    if (task.titleTask && task.idTask) {
+    if (task.titleTask && task.idTask && task.idUser) {
       return await this.updateTasksTitle(task);
     }
 
-    if (task.completed && task.idTask) {
+    if (task.completed && task.idTask && task.idUser) {
       return await this.updateTasksStatus(task);
     }
 
-    if (task.descriptionTask && task.idTask) {
+    if (task.descriptionTask && task.idTask && task.idUser) {
       return await this.updateTasksDescription(task);
     }
   }
