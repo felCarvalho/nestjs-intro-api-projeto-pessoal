@@ -103,7 +103,6 @@ export class AuthService {
 
     const findIdentifier = await this.credentialsRepo.findIdentifier(
       verifyCredentials.data.identifier,
-      verifyCredentials.data.user.id,
     );
 
     if (!findIdentifier) {
@@ -401,10 +400,8 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const findCredentials = await this.credentialsRepo.findIdentifier(
-      identifier,
-      idUser,
-    );
+    const findCredentials =
+      await this.credentialsRepo.findIdentifier(identifier);
 
     if (!findCredentials) {
       notification
@@ -485,10 +482,8 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const findCredentials = await this.credentialsRepo.findIdentifier(
-      identifier,
-      user.id,
-    );
+    const findCredentials =
+      await this.credentialsRepo.findIdentifier(identifier);
 
     if (findCredentials) {
       notification

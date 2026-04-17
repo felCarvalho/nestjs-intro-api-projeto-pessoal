@@ -32,7 +32,7 @@ export class RefreshTokenBuilder
     if (!user) {
       this.notification.setType('ERROR').setMessage('Ops, user inválido').add();
     }
-    this.refresh.user.id = user;
+    this.refresh.user = user;
     return this;
   }
 

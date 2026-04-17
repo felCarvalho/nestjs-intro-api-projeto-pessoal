@@ -7,11 +7,11 @@ export class RefreshTokenRepository
   implements RefreshTokenRepositoryContract<RefreshToken>
 {
   async findById(id: string, idUser: string) {
-    return await this.findOne({ id, user: { id: idUser } });
+    return await this.findOne({ id, user: idUser });
   }
 
   async findAllId(id: string, idUser: string) {
-    return await this.findAll({ where: { id, user: { id: idUser } } });
+    return await this.findAll({ where: { id, user: idUser } });
   }
 
   createRefreshToken(refreshToken: RefreshToken) {
@@ -19,6 +19,6 @@ export class RefreshTokenRepository
   }
 
   async findUserById(idUser: string) {
-    return await this.findOne({ user: { id: idUser } });
+    return await this.findOne({ user: idUser });
   }
 }

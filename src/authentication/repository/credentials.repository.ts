@@ -21,8 +21,8 @@ export class CredentialsRepository
     return this.create(credentials);
   }
 
-  async findIdentifier(identifier: string, idUser: string) {
-    return this.findOne({ identifier, user: { id: idUser } });
+  async findIdentifier(identifier: string) {
+    return this.findOne({ identifier });
   }
 
   async findUserById(id: string, idUser: string) {
