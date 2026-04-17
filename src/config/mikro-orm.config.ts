@@ -43,7 +43,7 @@ export default defineConfig({
     tableName: 'minhas-migrations',
     path: './dist/src/migrations',
     pathTs: './src/migrations',
-    glob: '*.{js,ts}',
+    glob: '!(*.d).{js,ts}',
     silent: false,
     transactional: true,
     disableForeignKeys: true,
