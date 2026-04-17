@@ -36,15 +36,23 @@ import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/de
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        ...defineConfig,
-        dbName: configService.get<string>('DATABASE'),
-        user: configService.get<string>('DB_USER'),
-        password: configService.get<string>('DB_PASSWORD'),
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        autoLoadEntities: true,
-      }),
+      useFactory: (configService: ConfigService) => {
+        const dbName = configService.get<string>('DATABASE') || configService.get<string>('DB_NAME');
+        console.log('Tentando conectar ao banco:', {
+          host: configService.get<string>('DB_HOST'),
+          dbName,
+          user: configService.get<string>('DB_USER'),
+        });
+        return {
+          ...defineConfig,
+          dbName,
+          user: configService.get<string>('DB_USER'),
+          password: configService.get<string>('DB_PASSWORD'),
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          autoLoadEntities: true,
+        };
+      },
       driver: PostgreSqlDriver,
     }),
   ],
