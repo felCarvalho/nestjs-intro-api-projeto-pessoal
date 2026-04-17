@@ -28,6 +28,7 @@ import { payload } from '../../shared/core/contracts/contracts.auth';
 import { RolesRepositoryContract } from '../contracts/roles.contracts';
 import { Roles } from '../entities/roles.entity';
 import { User } from '../../users/entity/user.entity';
+
 export class AuthService {
   constructor(
     private readonly persist: PersistContract<any>,

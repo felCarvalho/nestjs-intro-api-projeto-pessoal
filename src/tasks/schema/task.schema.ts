@@ -26,6 +26,7 @@ export const taskSchema = new EntitySchema<Tasks>({
       nullable: true,
     },
     completed: { type: 'string' },
+    status: { type: 'string', nullable: true, default: null },
     updateAt: { type: 'timestamptz', defaultRaw: 'now()' },
     createAt: { type: 'timestamptz', defaultRaw: 'now()' },
     deleteAt: { type: 'timestamptz', nullable: true, default: null },
@@ -42,7 +43,7 @@ export const taskSchema = new EntitySchema<Tasks>({
       default: false,
     },
     isCategory: {
-      name: 'taskIsCategory',
+      name: 'isCategory',
       cond: { category: { $ne: null } },
       default: true,
     },

@@ -15,7 +15,4 @@ export class UpdateTaskDto {
 
   @IsOptional()
   idTask: string;
-
-  @IsOptional()
-  deleted: string;
 }

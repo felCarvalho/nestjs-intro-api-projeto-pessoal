@@ -11,6 +11,36 @@ export class TasksRepository
       { id },
       {
         populate: ['category', 'user'],
+        filters: {
+          taskActive: false,
+          isCategory: false,
+        },
+      },
+    );
+  }
+
+  async allUpdateTasks(idUser: string, idCategory: string, completed: string) {
+    return await this.nativeUpdate(
+      {
+        user: { id: idUser },
+        category: { id: idCategory },
+      },
+      {
+        completed: completed,
+      },
+    );
+  }
+
+  async findByIdRascunhos(id: string) {
+    return await this.findOne(
+      { id },
+      {
+        populate: ['category', 'user'],
+        filters: {
+          taskActive: false,
+          isDeleted: false,
+          isCategory: false,
+        },
       },
     );
   }
@@ -23,20 +53,19 @@ export class TasksRepository
         filters: {
           taskDeleted: true,
           taskActive: false,
+          isCategory: false,
         },
       },
     );
   }
 
   async findAllBy(id: string) {
-    const tasks = await this.find(
+    return await this.find(
       { user: id },
       {
         populate: ['category'],
       },
     );
-
-    return tasks;
   }
 
   async searchTask(query: string, idUser: string) {
@@ -52,14 +81,46 @@ export class TasksRepository
   }
 
   async findTitle(name: string) {
-    return this.findOne({ title: name });
+    return await this.findOne(
+      { title: name },
+      {
+        filters: { isCategory: false },
+      },
+    );
   }
 
   async findAllTasksUser(id: string) {
-    return this.findAll({
+    return await this.findAll({
       where: { user: id },
       populate: ['category'],
     });
+  }
+
+  async findAllRascunhos(idUser: string) {
+    return await this.find(
+      {
+        user: idUser,
+        status: 'Inativa',
+      },
+      {
+        populate: ['category'],
+        filters: {
+          isCategory: false,
+        },
+      },
+    );
+  }
+
+  async deleteAllTasks(idCategory: string, idUser: string) {
+    return await this.nativeUpdate(
+      {
+        category: idCategory,
+        user: idUser,
+      },
+      {
+        deleteAt: new Date().toISOString(),
+      },
+    );
   }
 
   createTask(task: Tasks) {

@@ -41,7 +41,19 @@ export class TasksBuilder
     return this;
   }
 
-  setCompleted(completed: 'Incompleta' | 'Concluída') {
+  setStatus(status: string) {
+    if (!status) {
+      this.notification
+        .setType('ERROR')
+        .setMessage('Ops, erro ao validar o status da tarefa')
+        .add();
+    }
+
+    this.task.status = status;
+    return this;
+  }
+
+  setCompleted(completed: 'Incompleta' | 'Concluída' | 'Rascunho') {
     if (!completed) {
       this.notification
         .setType('ERROR')

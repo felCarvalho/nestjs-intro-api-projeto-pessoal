@@ -18,16 +18,33 @@ export const categorySchema = new EntitySchema<Category>({
     title: {
       type: 'string',
       length: 255,
-      unique: true,
     },
     description: {
       type: 'string',
       length: 150,
     },
     user: { kind: 'm:1', entity: () => User },
+    status: { type: 'string', nullable: true, default: null },
     updateAt: { type: 'timestamptz', defaultRaw: 'now()' },
     createAt: { type: 'timestamptz', defaultRaw: 'now()' },
     deleteAt: { type: 'timestamptz', nullable: true, default: null },
+  },
+  filters: {
+    categoryIsNotDeleted: {
+      name: 'categoryIsNotDeleted',
+      cond: { deleteAt: { $eq: null } },
+      default: true,
+    },
+    categoryIsInactive: {
+      name: 'categoryIsInactive',
+      cond: { status: { $eq: 'Inativa' } },
+      default: false,
+    },
+    categoryDeleted: {
+      name: 'categoryDeleted',
+      cond: { deleteAt: { $ne: null } },
+      default: false,
+    },
   },
   repository: () => CategoryRepository,
 });

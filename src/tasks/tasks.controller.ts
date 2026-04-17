@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { TasksService } from './service/task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateTaskDto } from './dto/create-task.dto';
 import { User } from '../shared/core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
 
@@ -20,22 +21,27 @@ export class TasksController {
 
   @Get()
   async getAllTasks(@User() user: { sub: string }) {
-    const allTasks = await this.tasksService.findAllTasks(user.sub);
+    return await this.tasksService.findAllTasks(user.sub);
+  }
 
-    return allTasks;
+  @Get('detalhes/:id')
+  async getTaskById(@Param('id') id: string, @User() user: { sub: string }) {
+    return await this.tasksService.findTasks(user.sub, id);
   }
 
   @Post('criar-tarefa')
   async createTask(
     @User() user: { sub: string },
-    @Body() task: { titleTask: string; descriptionTask: string },
+    @Body() createTaskDto: CreateTaskDto,
   ) {
-    return await this.tasksService.createTask({
+    const data = await this.tasksService.createTask({
       task: {
-        ...task,
+        ...createTaskDto,
       },
       user: user.sub,
     });
+
+    return data;
   }
 
   @Post('buscar/:search')

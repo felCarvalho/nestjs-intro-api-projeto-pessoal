@@ -8,4 +8,5 @@ export class Tasks extends baseEntity {
   completed: string;
   category!: Category;
   user!: User;
+  status: string;
 }

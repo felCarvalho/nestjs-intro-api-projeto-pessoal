@@ -154,6 +154,7 @@ export class TasksService {
     taskBuilder.setCreateDate(date);
     taskBuilder.setUpdateDate(date);
     taskBuilder.setCompleted('Incompleta');
+    taskBuilder.setStatus('Ativa');
     const taskBuild = taskBuilder.build();
 
     if (!taskBuild.success) {
@@ -195,6 +196,7 @@ export class TasksService {
     }
 
     const verifyTasksCreated = await this.createTaskCore(task, findUser);
+
     if (!verifyTasksCreated?.success) {
       throw new NotificationException(verifyTasksCreated);
     }
@@ -209,6 +211,7 @@ export class TasksService {
     taskBuilder.setCreateDate(date);
     taskBuilder.setUpdateDate(date);
     taskBuilder.setCompleted('Incompleta');
+    taskBuilder.setStatus('Inativa');
     const taskBuild = taskBuilder.build();
 
     if (!taskBuild.success) {
@@ -440,6 +443,33 @@ export class TasksService {
 
       throw new NotificationException(resultException);
     }
+  }
+
+  async allTasksDeleted(idUser: string, idCategory: string) {
+    return await this.taskRepo.deleteAllTasks(idCategory, idUser);
+  }
+
+  async allTasksUpdateStatus(
+    idUser: string,
+    idCategory: string,
+    completed: string,
+  ) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (completed !== 'Concluída' && completed !== 'Incompleta') {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Seu status está inválido para atualização')
+        .add();
+
+      result.setNotification(notification.build()).setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    return await this.taskRepo.allUpdateTasks(idUser, idCategory, completed);
   }
 
   async updateTasksStatus(task: UpdateTaskDto) {
@@ -787,7 +817,6 @@ export class TasksService {
     }
 
     const searchData = await this.taskRepo.searchTask(search, idUser);
-
     const data = result
       .setCode(200)
       .setSuccess(true)
@@ -797,17 +826,39 @@ export class TasksService {
     return data;
   }
 
+  async findAllRascunhos(id: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!id) {
+      notification.setType('ERROR').setMessage('Ops, id inválido').add();
+
+      const data = result
+        .setCode(404)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    const findAllRascunhos = await this.taskRepo.findAllRascunhos(id);
+    const data = result.setSuccess(true).setData(findAllRascunhos).build();
+
+    return data;
+  }
+
   async taskUpdate(task: UpdateTaskDto) {
     if (task.titleTask && task.idTask) {
-      await this.updateTasksTitle(task);
+      return await this.updateTasksTitle(task);
     }
 
     if (task.completed && task.idTask) {
-      await this.updateTasksStatus(task);
+      return await this.updateTasksStatus(task);
     }
 
     if (task.descriptionTask && task.idTask) {
-      await this.updateTasksDescription(task);
+      return await this.updateTasksDescription(task);
     }
   }
 }

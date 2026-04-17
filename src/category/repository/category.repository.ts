@@ -7,15 +7,48 @@ export class CategoryRepository
   implements CategoryRepositoryContracts<Category>
 {
   async findById(id: string) {
-    return this.findOne({ id });
+    return await this.findOne({ id });
   }
 
   async findAllId(id: string) {
-    return this.findAll({ where: { id } });
+    return await this.findAll({ where: { id: id } });
+  }
+
+  async findAllByUserId(idUser: string) {
+    return await this.findAll({ where: { user: { id: idUser } } });
+  }
+
+  async findByIds(id: string[]) {
+    return await this.find({ id: { $in: id } });
   }
 
   async findTitle(title: string) {
-    return this.findOne({ title });
+    return await this.findOne({ title });
+  }
+
+  async findByIdRascunhos(id: string, idUser: string) {
+    return await this.findOne({ id, user: { id: idUser } });
+  }
+
+  async deleteCategory(id: string, idUser: string) {
+    return await this.findOne({ id, user: { id: idUser } });
+  }
+
+  async findDeletedCategory(): Promise<Category[]> {
+    return await this.find({ deleteAt: { $ne: null } });
+  }
+
+  async findAllRascunhos(idUser: string) {
+    return await this.find(
+      {
+        user: idUser,
+      },
+      {
+        filters: {
+          categoryIsInactive: true,
+        },
+      },
+    );
   }
 
   createCategory(category: Category) {

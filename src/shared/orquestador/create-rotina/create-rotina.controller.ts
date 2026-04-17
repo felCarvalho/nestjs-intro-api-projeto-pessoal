@@ -1,24 +1,24 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { User } from '../../core/@custom-decorators/user-request/user.request';
-import { CreateTaskOrquestrador } from './create-task.orquestrador';
-import { CreateTaskDto } from './create.dto';
+import { CreateRotinaOrquestrador } from './create-rotina.orquestrador';
+import { CreateRotinaDto } from './create-rotina.dto';
 import { JwtAuthGuard } from '../../../authentication/auth-guards/auth.jwt.guard';
 import { UseGuards } from '@nestjs/common';
 
 @UseGuards(JwtAuthGuard)
 @Controller()
-export class CreateTaskOrquestradorController {
+export class CreateRotinaOrquestradorController {
   constructor(
-    private readonly createTaskOrquestrador: CreateTaskOrquestrador,
+    private readonly createRotinaOrquestrador: CreateRotinaOrquestrador,
   ) {}
 
   @Post('criar-rotina')
   async createTask(
     @User() user: { sub: string },
-    @Body() createTaskDto: CreateTaskDto,
+    @Body() createRotinaDto: CreateRotinaDto,
   ) {
-    return await this.createTaskOrquestrador.syncCategoryAndTasks(
-      createTaskDto,
+    return await this.createRotinaOrquestrador.syncCategoryAndTasks(
+      createRotinaDto,
       user.sub,
     );
   }

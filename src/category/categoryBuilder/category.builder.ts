@@ -40,6 +40,18 @@ export class CategoryBuilder
     return this;
   }
 
+  setStatus(status: 'Ativa' | 'Inativa') {
+    if (!status) {
+      this.notification
+        .setType('ERROR')
+        .setMessage('Ops! erro ao validar o status')
+        .add();
+    }
+
+    this.category.status = status;
+    return this;
+  }
+
   setUser(user: IUser) {
     if (!user) {
       this.notification

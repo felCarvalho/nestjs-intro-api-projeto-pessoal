@@ -43,10 +43,43 @@
         ]
       }
     },
+    "/home/detalhes/{id}": {
+      "get": {
+        "operationId": "TasksController_getTaskById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
     "/home/criar-tarefa": {
       "post": {
         "operationId": "TasksController_createTask",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTaskDto"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": ""
@@ -105,7 +138,14 @@
         },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         },
         "tags": [
@@ -134,7 +174,21 @@
         ]
       }
     },
-    "/home/adicionar-categoria": {
+    "/home/listar-categorias": {
+      "get": {
+        "operationId": "CategoryController_getCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/home/rascunhos/adicionar-categoria": {
       "post": {
         "operationId": "CategoryController_createdCategory",
         "parameters": [],
@@ -158,16 +212,72 @@
         ]
       }
     },
+    "/home/rascunhos/atualizar-categoria/{id}": {
+      "patch": {
+        "operationId": "CategoryController_updateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/home/rascunhos/deletar-categoria/{id}": {
+      "delete": {
+        "operationId": "CategoryController_deleteCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Category"
+        ]
+      }
+    },
     "/criar-rotina": {
       "post": {
-        "operationId": "CreateTaskOrquestradorController_createTask",
+        "operationId": "CreateRotinaOrquestradorController_createTask",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateTaskDto"
+                "$ref": "#/components/schemas/CreateRotinaDto"
               }
             }
           }
@@ -185,7 +295,7 @@
           }
         },
         "tags": [
-          "CreateTaskOrquestrador"
+          "CreateRotinaOrquestrador"
         ]
       }
     },
@@ -219,6 +329,81 @@
           "UserOrquestrado"
         ]
       }
+    },
+    "/home/rascunhos": {
+      "get": {
+        "operationId": "GetAllTaskCategoryRascunhoController_getAllTaskCategory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "GetAllTaskCategoryRascunho"
+        ]
+      }
+    },
+    "/home/categorias/atualizar-rotina": {
+      "put": {
+        "operationId": "UpdateCategoryTaskOrquestradorController_updateTask",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryTaskDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "UpdateCategoryTaskOrquestrador"
+        ]
+      }
+    },
+    "/home/categorias/deletar-tarefas-categoria/{id}": {
+      "delete": {
+        "operationId": "DeleteCategoryTaskOrquestradorController_deleteAllTaskCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "DeleteCategoryTaskOrquestrador"
+        ]
+      }
     }
   },
   "info": {
@@ -236,6 +421,21 @@
   "servers": [],
   "components": {
     "schemas": {
+      "CreateTaskDto": {
+        "type": "object",
+        "properties": {
+          "titleTask": {
+            "type": "string"
+          },
+          "descriptionTask": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "titleTask",
+          "descriptionTask"
+        ]
+      },
       "UpdateTaskDto": {
         "type": "object",
         "properties": {
@@ -253,9 +453,6 @@
           },
           "idTask": {
             "type": "string"
-          },
-          "deleted": {
-            "type": "string"
           }
         },
         "required": [
@@ -263,8 +460,7 @@
           "titleTask",
           "descriptionTask",
           "idUser",
-          "idTask",
-          "deleted"
+          "idTask"
         ]
       },
       "CreateCategoryDto": {
@@ -282,7 +478,26 @@
           "descriptionCategory"
         ]
       },
-      "CreateTaskDto": {
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "titleCategory": {
+            "type": "string"
+          },
+          "descriptionCategory": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "titleCategory",
+          "descriptionCategory",
+          "status"
+        ]
+      },
+      "CreateRotinaDto": {
         "type": "object",
         "properties": {
           "titleTask": {
@@ -339,6 +554,25 @@
           "identifier",
           "password",
           "passwordConfirm"
+        ]
+      },
+      "UpdateCategoryTaskDto": {
+        "type": "object",
+        "properties": {
+          "idCategory": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "string"
+          },
+          "statusCategory": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "idCategory",
+          "completed",
+          "statusCategory"
         ]
       }
     }
