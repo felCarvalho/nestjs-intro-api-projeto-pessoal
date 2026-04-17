@@ -15,10 +15,7 @@ export abstract class CredentialsBuilderContracts<T> {
 export abstract class CredentialsRepositoryContract<T> {
   abstract findById(id: string, idUser: string): Promise<T | null>;
   abstract findAllId(id: string, idUser: string): Promise<T[]>;
-  abstract findIdentifier(
-    identifier: string,
-    idUser: string,
-  ): Promise<T | null>;
+  abstract findIdentifier(identifier: string): Promise<T | null>;
   abstract findUserById(id: string, idUser: string): Promise<T | null>;
   abstract createCredentials(credentials: T): void;
 }
