@@ -1,15 +1,15 @@
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
-export class CreateTaskDto {
+export class CreateCategoryRascunhoDto {
   @IsString()
   @IsNotEmpty()
-  titleTask: string;
+  titleCategory: string;
 
-  @IsOptional()
   @IsString()
-  descriptionTask: string;
+  @IsOptional()
+  descriptionCategory: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   status: string;
 }

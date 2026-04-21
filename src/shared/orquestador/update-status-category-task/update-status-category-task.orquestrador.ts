@@ -18,8 +18,9 @@ export class UpdateCategoryTaskOrquestrador {
     private readonly transaction: TransactionContract,
   ) {}
 
-  async syncUpdateCategoryAndTasks(
+  async updateStatusCategoryAndTasks(
     updateDto: UpdateCategoryTaskDto,
+    idCategory: string,
     idUser: string,
   ) {
     const notification = this.notification();
@@ -29,7 +30,7 @@ export class UpdateCategoryTaskOrquestrador {
       notification.setType('ERROR').setMessage('Ops, usuário inválido').add();
     }
 
-    if (!updateDto.idCategory) {
+    if (!idCategory) {
       notification
         .setType('ERROR')
         .setMessage('Ops, id de categoria inválido')
@@ -54,7 +55,7 @@ export class UpdateCategoryTaskOrquestrador {
       }
 
       const findCategory = await this.categoryService.findByCategory(
-        updateDto.idCategory,
+        idCategory,
         idUser,
       );
 
@@ -65,7 +66,7 @@ export class UpdateCategoryTaskOrquestrador {
       try {
         await this.taskService.allTasksUpdateStatus(
           findUser.data.id,
-          updateDto.idCategory,
+          idCategory,
           updateDto.completed,
         );
         notification

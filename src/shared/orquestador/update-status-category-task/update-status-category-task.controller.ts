@@ -1,4 +1,4 @@
-import { Controller, Put, Body } from '@nestjs/common';
+import { Controller, Put, Body, Param } from '@nestjs/common';
 import { User } from '../../core/@custom-decorators/user-request/user.request';
 import { UpdateCategoryTaskOrquestrador } from './update-status-category-task.orquestrador';
 import { UpdateCategoryTaskDto } from './update-status-.category-task.dto';
@@ -12,13 +12,15 @@ export class UpdateCategoryTaskOrquestradorController {
     private readonly updateCategoryTaskOrquestrador: UpdateCategoryTaskOrquestrador,
   ) {}
 
-  @Put('atualizar-rotina')
+  @Put('atualizar-tarefas/:id')
   async updateTask(
     @User() user: { sub: string },
     @Body() updateDto: UpdateCategoryTaskDto,
+    @Param('id') id: string,
   ) {
-    return await this.updateCategoryTaskOrquestrador.syncUpdateCategoryAndTasks(
+    return await this.updateCategoryTaskOrquestrador.updateStatusCategoryAndTasks(
       updateDto,
+      id,
       user.sub,
     );
   }

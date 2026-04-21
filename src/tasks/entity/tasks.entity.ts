@@ -6,7 +6,7 @@ export class Tasks extends baseEntity {
   title: string;
   description: string;
   completed: string;
-  category!: Category;
+  category!: Category | null;
   user!: User;
   status: string;
 }

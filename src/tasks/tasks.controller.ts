@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { TasksService } from './service/task.service';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { CreateTaskDto } from './dto/create-task.dto';
 import { User } from '../shared/core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
 
@@ -27,21 +26,6 @@ export class TasksController {
   @Get('detalhes/:id')
   async getTaskById(@Param('id') id: string, @User() user: { sub: string }) {
     return await this.tasksService.findTasks(user.sub, id);
-  }
-
-  @Post('criar-tarefa')
-  async createTask(
-    @User() user: { sub: string },
-    @Body() createTaskDto: CreateTaskDto,
-  ) {
-    const data = await this.tasksService.createTask({
-      task: {
-        ...createTaskDto,
-      },
-      user: user.sub,
-    });
-
-    return data;
   }
 
   @Post('buscar/:search')
@@ -75,6 +59,6 @@ export class TasksController {
 
   @Delete(':id')
   async deleteTask(@Param('id') id: string, @User() user: { sub: string }) {
-    await this.tasksService.updateDeletedTask({ idTask: id, idUser: user.sub });
+    await this.tasksService.deletedTask({ idTask: id, idUser: user.sub });
   }
 }

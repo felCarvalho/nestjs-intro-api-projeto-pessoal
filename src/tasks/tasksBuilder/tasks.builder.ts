@@ -65,14 +65,7 @@ export class TasksBuilder
     return this;
   }
 
-  setCategory(category: ICategory) {
-    if (!category) {
-      this.notification
-        .setType('ERROR')
-        .setMessage('Ops! erro ao validar id da categoria')
-        .add();
-    }
-
+  setCategory(category: ICategory | null) {
     this.task.category = category;
     return this;
   }

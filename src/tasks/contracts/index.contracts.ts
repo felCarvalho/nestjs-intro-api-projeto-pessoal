@@ -31,7 +31,7 @@ export abstract class TaskRepositoryContract<T> {
 export abstract class TaskBuilderContract<T> {
   abstract setTitle(title: string): this;
   abstract setDescription(description: string): this;
-  abstract setCategory(category: ICategory): this;
+  abstract setCategory(category: ICategory | null): this;
   abstract setCompleted(completed: 'Incompleta' | 'Concluída'): this;
   abstract setCreateDate(date: string): this;
   abstract setUser(user: IUser): this;

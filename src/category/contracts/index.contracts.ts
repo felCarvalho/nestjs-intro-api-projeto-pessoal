@@ -4,13 +4,15 @@ import { ICategory, IUser } from '../../shared/core/types/types';
 export abstract class CategoryRepositoryContracts<T> {
   abstract findById(id: string, idUser: string): Promise<T | null>;
   abstract findAllId(id: string, idUser: string): Promise<T[]>;
-  abstract findTitle(title: string, idUser: string): Promise<T | null>;
+  abstract findTitle(
+    title: string,
+    idUser: string,
+    status: string,
+  ): Promise<T | null>;
   abstract createCategory(category: ICategory): void;
-  abstract findAllRascunhos(idUser: string): Promise<T[]>;
   abstract findByIds(id: string[], idUser: string): Promise<T[]>;
-  abstract findDeletedCategory(idUser: string): Promise<T[]>;
-  abstract findByIdRascunhos(id: string, idUser: string): Promise<T | null>;
   abstract findAllByUserId(idUser: string): Promise<T[]>;
+  abstract findAllRascunhos(idUser: string): Promise<T[]>;
 }
 
 export abstract class CategoryBuilderContracts<T> {
