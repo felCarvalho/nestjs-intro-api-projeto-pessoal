@@ -19,6 +19,9 @@ import { GetAllTaskCategoryRascunhoModule } from './shared/orquestador/get-all-t
 import { GetAllTaskCategoryActiveOrquestrador } from './shared/orquestador/get-all-task-category-active/get-all-task-category-active.orquestrador';
 import { UpdateCategoryTaskOrquestradorModule } from './shared/orquestador/update-status-category-task/update-status-category-task.module';
 import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/delete-all-category-task/delete-all-category-task.module';
+import { CreateTaskOrquestradorModule } from './shared/orquestador/create-task/create-task.module';
+import { CreateTaskRascunhoModule } from './shared/orquestador/create-task-rascunho/create-task-rascunho.module';
+import { CreateCategoryRascunhoModule } from './shared/orquestador/create-category-rascunho/create-category-rascunho.module';
 
 @Module({
   imports: [
@@ -32,6 +35,9 @@ import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/de
     UpdateCategoryTaskOrquestradorModule,
     DeleteAllCategoryTaskOrquestradorModule,
     GetAllTaskCategoryActiveOrquestrador,
+    CreateTaskOrquestradorModule,
+    CreateTaskRascunhoModule,
+    CreateCategoryRascunhoModule,
     ConfigModule.forRoot({ isGlobal: true }),
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
