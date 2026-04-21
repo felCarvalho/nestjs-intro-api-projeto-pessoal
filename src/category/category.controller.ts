@@ -1,6 +1,5 @@
 import {
   Controller,
-  Post,
   Patch,
   Delete,
   Get,
@@ -10,12 +9,11 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './service/category.service';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { CreateCategoryDto } from './dto/create-category.dto';
 import { User } from '../shared/core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../authentication/auth-guards/auth.jwt.guard';
 
 @UseGuards(JwtAuthGuard)
-@Controller('home')
+@Controller('home/categorias')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -24,16 +22,17 @@ export class CategoryController {
     return await this.categoryService.findAllCategories(user.sub);
   }
 
-  @Post('rascunhos/adicionar-categoria')
-  async createdCategory(
+  @Patch('atualizar-categoria/:id')
+  async updateCategoryTitle(
     @User() user: { sub: string },
-    @Body() category: CreateCategoryDto,
+    @Body() category: UpdateCategoryDto,
+    @Param('id') id: string,
   ) {
-    return this.categoryService.createCategory(category, user.sub);
+    return await this.categoryService.updateCategory(category, id, user.sub);
   }
 
   @Patch('rascunhos/atualizar-categoria/:id')
-  async updateCategory(
+  async updateCategoryRascunhos(
     @User() user: { sub: string },
     @Body() category: UpdateCategoryDto,
     @Param('id') id: string,

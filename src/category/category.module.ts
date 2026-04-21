@@ -10,8 +10,6 @@ import { Category } from './entity/category.entity';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { CategoryService } from './service/category.service';
 import { UsersModule } from '../users/users.module';
-import { UserRepositoryContract } from '../users/contracts/index.contract';
-import { User } from '../users/entity/user.entity';
 import { CategoryController } from './category.controller';
 import { PersistContract } from '../shared/core/contracts/contracts.persistence';
 
@@ -44,7 +42,6 @@ import { PersistContract } from '../shared/core/contracts/contracts.persistence'
         result: () => ResultBuilderContract<Category>,
         categoryRepo: CategoryRepositoryContracts<Category>,
         categoryBuilder: () => CategoryBuilderContracts<Category>,
-        userRepo: UserRepositoryContract<User>,
         persist: PersistContract<Category>,
       ) => {
         return new CategoryService(
@@ -52,7 +49,6 @@ import { PersistContract } from '../shared/core/contracts/contracts.persistence'
           result,
           categoryRepo,
           categoryBuilder,
-          userRepo,
           persist,
         );
       },
@@ -61,7 +57,6 @@ import { PersistContract } from '../shared/core/contracts/contracts.persistence'
         ResultBuilderContract,
         CategoryRepositoryContracts,
         CategoryBuilderContracts,
-        UserRepositoryContract,
         PersistContract,
       ],
     },
