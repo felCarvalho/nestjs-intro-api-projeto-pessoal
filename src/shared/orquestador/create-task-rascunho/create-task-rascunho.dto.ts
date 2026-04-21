@@ -6,24 +6,16 @@ import {
   IsOptional,
 } from 'class-validator';
 
-export class CreateRotinaDto {
+export class CreateTaskRascunhoDto {
   @IsString()
   @IsNotEmpty()
   titleTask: string;
 
   @IsString()
+  @IsOptional()
   @MinLength(0)
   @MaxLength(255)
   descriptionTask: string;
-
-  @IsString()
-  @IsNotEmpty()
-  titleCategory: string;
-
-  @IsString()
-  @MinLength(0)
-  @MaxLength(255)
-  descriptionCategory: string;
 
   @IsString()
   @IsOptional()

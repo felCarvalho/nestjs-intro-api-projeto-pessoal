@@ -20,7 +20,10 @@ export class CreateRotinaOrquestrador {
     private readonly userRepo: UserRepositoryContract<User>,
   ) {}
 
-  async syncCategoryAndTasks(createRotinaDto: CreateRotinaDto, idUser: string) {
+  async createCategoryAndTasks(
+    createRotinaDto: CreateRotinaDto,
+    idUser: string,
+  ) {
     const notification = this.notification();
     const result = this.result();
 
@@ -55,11 +58,10 @@ export class CreateRotinaOrquestrador {
         throw new NotificationException(result.build());
       }
 
-      const categoryCreated =
-        await this.categoryService.createCategoryTransaction(
-          { ...createRotinaDto },
-          findUser,
-        );
+      const categoryCreated = await this.categoryService.createCategory(
+        createRotinaDto,
+        findUser,
+      );
 
       if (!categoryCreated.success) {
         notification
@@ -75,7 +77,7 @@ export class CreateRotinaOrquestrador {
         throw new NotificationException(result.build());
       }
 
-      const taskCreated = await this.taskService.createRotina(
+      const taskCreated = await this.taskService.createTask(
         createRotinaDto,
         categoryCreated.data as Category,
         findUser,

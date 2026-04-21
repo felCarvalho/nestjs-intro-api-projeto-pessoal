@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '../../../authentication/auth-guards/auth.jwt.guard
 import { UseGuards } from '@nestjs/common';
 
 @UseGuards(JwtAuthGuard)
-@Controller()
+@Controller('home')
 export class CreateRotinaOrquestradorController {
   constructor(
     private readonly createRotinaOrquestrador: CreateRotinaOrquestrador,
@@ -17,7 +17,7 @@ export class CreateRotinaOrquestradorController {
     @User() user: { sub: string },
     @Body() createRotinaDto: CreateRotinaDto,
   ) {
-    return await this.createRotinaOrquestrador.syncCategoryAndTasks(
+    return await this.createRotinaOrquestrador.createCategoryAndTasks(
       createRotinaDto,
       user.sub,
     );
