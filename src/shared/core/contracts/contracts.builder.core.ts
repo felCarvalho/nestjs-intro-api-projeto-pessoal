@@ -1,13 +1,13 @@
 export abstract class BuilderCoreDataContract {
   abstract id: string;
-  abstract createAt: string;
-  abstract updateAt: string;
-  abstract deleteAt: string | null;
+  abstract createAt: Date;
+  abstract updateAt: Date;
+  abstract deleteAt: Date | null;
 }
 
 export abstract class BuilderCoreContract {
-  abstract generateId(id: string): this;
-  abstract setCreateDate(date: string): this;
-  abstract setUpdateDate(date: string): this;
-  abstract setDeleteDate(date: string): this;
+  abstract generateId(): this;
+  abstract setCreateDate(date: Date): this;
+  abstract setUpdateDate(date: Date): this;
+  abstract setDeleteDate(date: Date | null): this;
 }
