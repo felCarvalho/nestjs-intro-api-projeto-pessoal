@@ -1,4 +1,4 @@
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 import { ResultData } from '../../shared/core/result/result';
 import { HashContract } from '../../shared/core/contracts/contracts.hash';
 
@@ -10,9 +10,9 @@ export abstract class PassHashRepositoryContract<T> {
 }
 
 export abstract class PassHashBuilderContracts<T> extends HashContract {
-  abstract setCreateDate(date: string): this;
-  abstract generateId(): this | void;
-  abstract setUpdateDate(date: string): this;
-  abstract setUser(user: IUser): this;
+  abstract setCreateDate(date: Date): this;
+  abstract generateId(): this;
+  abstract setUpdateDate(date: Date): this;
+  abstract setUser(user: User): this;
   abstract build(): ResultData<T>;
 }

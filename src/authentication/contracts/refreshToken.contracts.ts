@@ -10,9 +10,9 @@ export abstract class RefreshTokenRepositoryContract<T> {
 
 export abstract class RefreshTokenBuilderContracts<T> extends HashContract {
   abstract setStatus(status: 'ATIVO' | 'INATIVO'): this;
-  abstract generateId(): this | void;
-  abstract setCreateDate(date: string): this;
+  abstract generateId(): this;
+  abstract setCreateDate(date: Date): this;
   abstract setUser(user: string): this;
-  abstract setUpdateDate(date: string): this;
+  abstract setUpdateDate(date: Date): this;
   abstract build(): ResultData<T>;
 }

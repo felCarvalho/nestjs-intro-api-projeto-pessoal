@@ -49,7 +49,7 @@ export class RefreshTokenBuilder
     return this;
   }
 
-  setStatus(status: string) {
+  setStatus(status: 'ATIVO' | 'INATIVO') {
     if (!status) {
       this.notification
         .setType('ERROR')
@@ -60,12 +60,12 @@ export class RefreshTokenBuilder
     return this;
   }
 
-  setCreateDate(date: string) {
+  setCreateDate(date: Date) {
     this.refresh.createAt = date;
     return this;
   }
 
-  setUpdateDate(date: string) {
+  setUpdateDate(date: Date) {
     this.refresh.updateAt = date;
     return this;
   }
