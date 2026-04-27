@@ -23,6 +23,26 @@ export class TasksController {
     return await this.tasksService.findAllTasks(user.sub);
   }
 
+  @Get('hoje')
+  async getTodayTasks(@User() user: { sub: string }) {
+    return await this.tasksService.filterTodayTasks(user.sub);
+  }
+
+  @Get('semana')
+  async getWeekTasks(@User() user: { sub: string }) {
+    return await this.tasksService.filterWeekTasks(user.sub);
+  }
+
+  @Get('mes')
+  async getMonthTasks(@User() user: { sub: string }) {
+    return await this.tasksService.filterMonthTasks(user.sub);
+  }
+
+  @Get('todos')
+  async getAllPeriodTasks(@User() user: { sub: string }) {
+    return await this.tasksService.filterAllPeriodTasks(user.sub);
+  }
+
   @Get('detalhes/:id')
   async getTaskById(@Param('id') id: string, @User() user: { sub: string }) {
     return await this.tasksService.findTasks(user.sub, id);

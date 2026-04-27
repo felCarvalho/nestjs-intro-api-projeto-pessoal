@@ -1,14 +1,7 @@
-import { NotificationBuilderContract } from '../../shared/core/contracts/contracts.notification';
-import {
-  ResultBuilderContract,
-  ResultContract,
-} from '../../shared/core/contracts/contracts.result';
-import { ICategory, IUser } from '../../shared/core/types/types';
-import { Tasks } from '../entity/tasks.entity';
-import { CreateTaskDto } from '../dto/create-task.dto';
-import { Category } from '../../category/entity/category.entity';
+import { ResultContract } from '../../shared/core/contracts/contracts.result';
 import { User } from '../../users/entity/user.entity';
-import { UpdateTaskDto } from '../dto/update-task.dto';
+import { Tasks } from '../entity/tasks.entity';
+import { Category } from '../../category/entity/category.entity';
 
 export abstract class TaskRepositoryContract<T> {
   abstract findById: (id: string, iduser: string) => Promise<T | null>;
@@ -26,46 +19,22 @@ export abstract class TaskRepositoryContract<T> {
     completed: string,
   ): Promise<number>;
   abstract deleteAllTasks(idCategory: string, idUser: string): Promise<number>;
+  abstract findTodayTasks(idUser: string, start: Date, end: Date): Promise<T[]>;
+  abstract findWeekTasks(idUser: string, start: Date, end: Date): Promise<T[]>;
+  abstract findMonthTasks(idUser: string, start: Date, end: Date): Promise<T[]>;
+  abstract findAllPeriodTasks(idUser: string): Promise<T[]>;
 }
 
 export abstract class TaskBuilderContract<T> {
   abstract setTitle(title: string): this;
   abstract setDescription(description: string): this;
-  abstract setCategory(category: ICategory | null): this;
+  abstract setCategory(category: Category | null): this;
   abstract setCompleted(completed: 'Incompleta' | 'Concluída'): this;
-  abstract setCreateDate(date: string): this;
-  abstract setUser(user: IUser): this;
-  abstract setUpdateDate(date: string): this;
-  abstract setDeleteDate(date: string): this;
+  abstract setCreateDate(date: Date): this;
+  abstract setUser(user: User): this;
+  abstract setUpdateDate(date: Date): this;
+  abstract setDeleteDate(date: Date | null): this;
   abstract setStatus(status: 'Ativa' | 'Inativa'): this;
   abstract generateId(): this;
   abstract build(): ResultContract<T>;
-}
-
-export abstract class TaskServiceContract {
-  abstract notificationBuilder(): NotificationBuilderContract;
-  abstract resultBuilder(): ResultBuilderContract<Tasks | Tasks[]>;
-  abstract verifyMaxLength(data: string, maxLength: number): boolean;
-  abstract verifyMinLength(data: string, minLength: number): boolean;
-  abstract createTask(
-    task: CreateTaskDto,
-    category: Category,
-    user: User,
-  ): Promise<void>;
-  abstract updateTasksTitle(
-    task: UpdateTaskDto,
-  ): Promise<ResultContract<Tasks | Tasks[]>>;
-  abstract updateTasksStatus(
-    task: UpdateTaskDto,
-  ): Promise<ResultContract<Tasks | Tasks[]>>;
-  abstract updateTasksDescription(
-    task: UpdateTaskDto,
-  ): Promise<ResultContract<Tasks | Tasks[]>>;
-  abstract findTasks(
-    idUser: string,
-    idTasks: string,
-  ): Promise<ResultContract<Tasks | Tasks[]>>;
-  abstract findAllTasks(
-    idUser: string,
-  ): Promise<ResultContract<Tasks | Tasks[]>>;
 }

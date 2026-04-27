@@ -118,12 +118,40 @@ export class TasksRepository
         user: idUser,
       },
       {
-        deleteAt: new Date().toISOString(),
+        deleteAt: new Date(),
       },
     );
   }
 
   createTask(task: Tasks) {
     this.create(task);
+  }
+
+  async findTodayTasks(idUser: string, start: Date, end: Date) {
+    return await this.find(
+      { user: { id: idUser }, createAt: { $gte: start, $lt: end } },
+      { populate: ['category'], filters: { isCategory: false } },
+    );
+  }
+
+  async findWeekTasks(idUser: string, start: Date, end: Date) {
+    return await this.find(
+      { user: idUser, createAt: { $gte: start, $lt: end } },
+      { populate: ['category'], filters: { isCategory: false } },
+    );
+  }
+
+  async findMonthTasks(idUser: string, start: Date, end: Date) {
+    return await this.find(
+      { user: idUser, createAt: { $gte: start, $lt: end } },
+      { populate: ['category'], filters: { isCategory: false } },
+    );
+  }
+
+  async findAllPeriodTasks(idUser: string) {
+    return await this.find(
+      { user: idUser },
+      { populate: ['category'], filters: { isCategory: false } },
+    );
   }
 }

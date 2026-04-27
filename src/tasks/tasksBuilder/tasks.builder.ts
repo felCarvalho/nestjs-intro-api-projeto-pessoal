@@ -2,7 +2,8 @@ import { Tasks } from '../entity/tasks.entity';
 import { TaskBuilderContract } from '../contracts/index.contracts';
 import { NotificationBuilderContract } from '../../shared/core/contracts/contracts.notification';
 import { ResultBuilderContract } from '../../shared/core/contracts/contracts.result';
-import { ICategory, IUser } from '../../shared/core/types/types';
+import { Category } from '../../category/entity/category.entity';
+import { User } from '../../users/entity/user.entity';
 import { BuilderCore } from '../../shared/core/builderCore/builder.core';
 
 export class TasksBuilder
@@ -41,7 +42,7 @@ export class TasksBuilder
     return this;
   }
 
-  setStatus(status: string) {
+  setStatus(status: 'Ativa' | 'Inativa') {
     if (!status) {
       this.notification
         .setType('ERROR')
@@ -65,12 +66,12 @@ export class TasksBuilder
     return this;
   }
 
-  setCategory(category: ICategory | null) {
+  setCategory(category: Category | null) {
     this.task.category = category;
     return this;
   }
 
-  setUser(user: IUser) {
+  setUser(user: User) {
     if (!user) {
       this.notification
         .setType('ERROR')
