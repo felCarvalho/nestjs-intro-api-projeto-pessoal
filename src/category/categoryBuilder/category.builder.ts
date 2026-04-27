@@ -2,7 +2,7 @@ import { Category } from '../entity/category.entity';
 import { CategoryBuilderContracts } from '../contracts/index.contracts';
 import { NotificationBuilderContract } from '../../shared/core/contracts/contracts.notification';
 import { ResultBuilderContract } from '../../shared/core/contracts/contracts.result';
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 import { BuilderCore } from '../../shared/core/builderCore/builder.core';
 
 export class CategoryBuilder
@@ -52,7 +52,7 @@ export class CategoryBuilder
     return this;
   }
 
-  setUser(user: IUser) {
+  setUser(user: User) {
     if (!user) {
       this.notification
         .setType('ERROR')

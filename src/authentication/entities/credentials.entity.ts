@@ -1,8 +1,8 @@
 import { baseEntity } from '../../shared/core/baseEntity/base.schema';
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 
 export class Credentials extends baseEntity {
   identifier: string = '';
   provider: string = '';
-  user: IUser;
+  user: User;
 }

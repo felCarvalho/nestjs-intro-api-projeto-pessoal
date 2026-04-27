@@ -283,7 +283,7 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     //continuação do builder de refresh token
     const refreshTokenData = this.refreshTokenBuilder();
@@ -502,7 +502,7 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const credentialBuilder = this.credentialsBuilder();
     credentialBuilder.generateId();
@@ -606,7 +606,7 @@ export class AuthService {
 
     console.log('chegou até aqui');
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const passwordBuilder = this.passHashBuilder();
     passwordBuilder.generateId();
@@ -702,7 +702,7 @@ export class AuthService {
 
       throw new NotificationException(resultException);
     }
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const userRolesBuilder = this.userRolesBuilder()
       .setRoleId(findUserRoles)

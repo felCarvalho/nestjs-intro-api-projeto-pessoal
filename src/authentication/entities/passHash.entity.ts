@@ -1,7 +1,7 @@
 import { baseEntity } from '../../shared/core/baseEntity/base.schema';
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 
 export class PassHash extends baseEntity {
   hash: string = '';
-  user: IUser;
+  user: User;
 }

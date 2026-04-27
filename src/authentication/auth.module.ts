@@ -10,7 +10,7 @@ import { NotificationBuilderContract } from '../shared/core/contracts/contracts.
 import { PersistContract } from '../shared/core/contracts/contracts.persistence';
 import { ResultBuilderContract } from '../shared/core/contracts/contracts.result';
 import { ModuleCore } from '../shared/core/moduleCore/module.core';
-import { IPassHash } from '../shared/core/types/types';
+import { PassHash } from './entities/passHash.entity';
 import { JwtAuthGuard } from './auth-guards/auth.jwt.guard';
 import { jwtRefreshTokenGuard } from './auth-guards/auth.jwtRefreshToken.guard';
 import { localAuthGuard } from './auth-guards/auth.local.guard';
@@ -40,7 +40,6 @@ import {
   UserRolesRepositoryContract,
 } from './contracts/userRoules.contracts';
 import { Credentials } from './entities/credentials.entity';
-import { PassHash } from './entities/passHash.entity';
 import { RefreshToken } from './entities/refreshToken.entity';
 import { Roles } from './entities/roles.entity';
 import { UserRoles } from './entities/userRoles.entity';
@@ -91,7 +90,7 @@ import { AuthService } from './service/auth.service';
     {
       provide: PassHashBuilderContracts,
       useFactory: (
-        result: () => ResultBuilderContract<IPassHash>,
+        result: () => ResultBuilderContract<PassHash>,
         notification: () => NotificationBuilderContract,
         encrypt: typeof bcrypt,
         configService: ConfigService,
@@ -197,12 +196,12 @@ import { AuthService } from './service/auth.service';
         notification: () => NotificationBuilderContract,
         result: () => ResultBuilderContract<any>,
         refreshTokenRepo: RefreshTokenRepositoryContract<RefreshToken>,
-        passHashRepo: PassHashRepositoryContract<IPassHash>,
+        passHashRepo: PassHashRepositoryContract<PassHash>,
         credentialsRepo: CredentialsRepositoryContract<Credentials>,
         userRolesRepo: UserRolesRepositoryContract<UserRoles>,
         rolesRepo: RolesRepositoryContract<Roles>,
         credentialsBuilder: () => CredentialsBuilderContracts<Credentials>,
-        passHashBuilder: () => PassHashBuilderContracts<IPassHash>,
+        passHashBuilder: () => PassHashBuilderContracts<PassHash>,
         refreshTokenBuilder: () => RefreshTokenBuilderContracts<RefreshToken>,
         userRolesBuilder: () => UserRolesBuilderContract<UserRoles>,
         baseAuth: BaseAuthContract,

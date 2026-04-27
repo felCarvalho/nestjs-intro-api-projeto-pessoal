@@ -29,17 +29,17 @@ export class BuilderCore implements BuilderCoreContract {
     return this;
   }
 
-  setCreateDate(date: string) {
+  setCreateDate(date: Date) {
     this.data.createAt = date;
     return this;
   }
 
-  setUpdateDate(date: string) {
+  setUpdateDate(date: Date) {
     this.data.updateAt = date;
     return this;
   }
 
-  setDeleteDate(date: string) {
+  setDeleteDate(date: Date | null) {
     this.data.deleteAt = date;
     return this;
   }

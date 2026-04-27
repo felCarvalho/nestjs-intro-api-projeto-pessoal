@@ -3,7 +3,7 @@ import { CredentialsBuilderContracts } from '../contracts/credentials.contracts'
 import { NotificationBuilderContract } from 'src/shared/core/contracts/contracts.notification';
 import { ResultBuilderContract } from 'src/shared/core/contracts/contracts.result';
 import { v4 as uuidv4 } from 'uuid';
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 
 const emailRegex =
   /^(?!\.)(?!.*\.\.)([a-z0-9_'+\-\.]*)[a-z0-9_'+\-]@([a-z0-9][a-z0-9\-]*\.)+[a-z]{2,}$/i;
@@ -44,7 +44,7 @@ export class CredentialsBuilder implements CredentialsBuilderContracts<Credentia
     return this;
   }
 
-  setUser(user: IUser) {
+  setUser(user: User) {
     if (!user) {
       this.notification.setType('ERROR').setMessage('Ops, user inválido').add();
     }
@@ -66,12 +66,12 @@ export class CredentialsBuilder implements CredentialsBuilderContracts<Credentia
     return this;
   }
 
-  setCreateDate(date: string) {
+  setCreateDate(date: Date) {
     this.credentials.createAt = date;
     return this;
   }
 
-  setUpdateDate(date: string) {
+  setUpdateDate(date: Date) {
     this.credentials.updateAt = date;
     return this;
   }

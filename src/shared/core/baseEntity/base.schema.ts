@@ -2,16 +2,16 @@ import { EntitySchema } from '@mikro-orm/core';
 
 export interface IBaseEntity {
   id: string;
-  createAt: string;
-  updateAt: string;
-  deleteAt: string | null;
+  createAt: Date;
+  updateAt: Date;
+  deleteAt: Date | null;
 }
 
 export class baseEntity implements IBaseEntity {
   id: string = '';
-  createAt: string = '';
-  updateAt: string = '';
-  deleteAt: string | null = null;
+  createAt: Date = new Date();
+  updateAt: Date = new Date();
+  deleteAt: Date | null = null;
 }
 
 export const baseEntitySchema = new EntitySchema({

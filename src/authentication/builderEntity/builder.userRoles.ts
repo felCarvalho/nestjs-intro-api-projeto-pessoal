@@ -39,18 +39,18 @@ export class UserRolesBuilder implements UserRolesBuilderContract<UserRoles> {
     return this;
   }
 
-  setCreateDate(date: string) {
+  setCreateDate(date: Date) {
     this.userRoles.createAt = date;
     return this;
   }
 
-  setUpdateDate(date: string) {
+  setUpdateDate(date: Date) {
     this.userRoles.updateAt = date;
     return this;
   }
 
-  setDeleteDate(date: string) {
-    this.userRoles.updateAt = date;
+  setDeleteDate(date: Date | null) {
+    this.userRoles.deleteAt = date;
     return this;
   }
 

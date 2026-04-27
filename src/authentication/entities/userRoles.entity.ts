@@ -1,10 +1,10 @@
-import { IUser } from '../../shared/core/types/types';
-import { IRoles } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
+import { Roles } from '../../authentication/entities/roles.entity';
 
 export class UserRoles {
-  user: IUser;
-  role: IRoles;
-  createAt: string = new Date().toISOString();
-  deleteAt: string | null = null;
-  updateAt: string = new Date().toISOString();
+  user: User;
+  role: Roles;
+  createAt: Date = new Date();
+  deleteAt: Date | null = null;
+  updateAt: Date = new Date();
 }

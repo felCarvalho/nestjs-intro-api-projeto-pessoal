@@ -65,7 +65,7 @@ export class UsersService {
       throw new NotificationException(resultException);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const user = this.userBuilder();
     user.setName(name);

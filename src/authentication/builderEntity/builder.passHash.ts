@@ -2,7 +2,7 @@ import { PassHash } from '../entities/passHash.entity';
 import { PassHashBuilderContracts } from '../contracts/passHash.contract';
 import { NotificationBuilderContract } from 'src/shared/core/contracts/contracts.notification';
 import { ResultBuilderContract } from 'src/shared/core/contracts/contracts.result';
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 import * as bcrypt from 'bcrypt';
 import { BaseHash } from '../../shared/core/baseHash/baseHash';
 import { ConfigService } from '@nestjs/config';
@@ -29,7 +29,7 @@ export class PassHashBuilder
     this.result = result;
   }
 
-  setUser(user: IUser) {
+  setUser(user: User) {
     if (!user) {
       this.notification.setType('ERROR').setMessage('Ops, user inválido').add();
     }
@@ -50,17 +50,17 @@ export class PassHashBuilder
     return this;
   }
 
-  setDeleteDate(date: string) {
+  setDeleteDate(date: Date) {
     this.passHash.deleteAt = date;
     return this;
   }
 
-  setCreateDate(date: string) {
+  setCreateDate(date: Date) {
     this.passHash.createAt = date;
     return this;
   }
 
-  setUpdateDate(date: string) {
+  setUpdateDate(date: Date) {
     this.passHash.updateAt = date;
     return this;
   }

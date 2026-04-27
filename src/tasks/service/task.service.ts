@@ -123,7 +123,7 @@ export class TasksService {
       throw new NotificationException(taskCreated);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const createdBTaskBuilder = this.taskBuilder();
     createdBTaskBuilder.generateId();
@@ -146,6 +146,152 @@ export class TasksService {
     this.taskRepo.createTask(taskBuild.data);
 
     return result.setData(taskBuild.data).setSuccess(true).build();
+  }
+
+  async filterTodayTasks(idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!idUser) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas de hoje para seu usuario')
+        .add();
+    }
+
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    const findTasks = await this.taskRepo.findTodayTasks(idUser, start, end);
+
+    if (!findTasks) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas de hoje para voce')
+        .add();
+    }
+
+    notification.setType('INFO').setMessage('Opa, Suas tarefas de hoje').add();
+
+    return result
+      .setCode(200)
+      .setNotification(notification.build())
+      .setData(findTasks)
+      .setSuccess(true)
+      .build();
+  }
+
+  async filterWeekTasks(idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!idUser) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas para seu usuario')
+        .add();
+    }
+
+    const start = new Date();
+    start.setDate(start.getDate() - start.getDay());
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 7);
+
+    const findTasks = await this.taskRepo.findWeekTasks(idUser, start, end);
+
+    if (!findTasks) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas desta semana para voce')
+        .add();
+    }
+
+    notification
+      .setType('INFO')
+      .setMessage('Opa, Suas tarefas da semana estão aqui')
+      .add();
+
+    return result
+      .setCode(200)
+      .setNotification(notification.build())
+      .setData(findTasks)
+      .setSuccess(true)
+      .build();
+  }
+
+  async filterMonthTasks(idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!idUser) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas para seu usuario')
+        .add();
+    }
+
+    const start = new Date();
+    start.setDate(1);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+
+    const findTasks = await this.taskRepo.findMonthTasks(idUser, start, end);
+
+    if (!findTasks) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas deste mês para voce')
+        .add();
+    }
+
+    notification
+      .setType('INFO')
+      .setMessage('Opa, Suas tarefas do mês estão aqui')
+      .add();
+
+    return result
+      .setCode(200)
+      .setNotification(notification.build())
+      .setData(findTasks)
+      .setSuccess(true)
+      .build();
+  }
+
+  async filterAllPeriodTasks(idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!idUser) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas para seu usuario')
+        .add();
+    }
+
+    const findTasks = await this.taskRepo.findAllPeriodTasks(idUser);
+
+    if (!findTasks) {
+      notification
+        .setType('INFO')
+        .setMessage('Ops! não encontramos tarefas para voce')
+        .add();
+    }
+
+    notification
+      .setType('INFO')
+      .setMessage('Opa, Todas as suas tarefas estão aqui')
+      .add();
+
+    return result
+      .setCode(200)
+      .setNotification(notification.build())
+      .setData(findTasks)
+      .setSuccess(true)
+      .build();
   }
 
   private async updateTasksTitle(task: UpdateTaskDto) {
@@ -297,7 +443,7 @@ export class TasksService {
       throw new NotificationException(resultException);
     }
 
-    findTasks.deleteAt = new Date().toISOString();
+    findTasks.deleteAt = new Date();
     this.persist.persist(findTasks);
 
     try {
@@ -401,54 +547,40 @@ export class TasksService {
 
     //.log(findTasks?.user, 'ops, idUser', task.idUser);
 
-    if (findTasks && findTasks.user.id !== task.idUser) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Essa rotina só pode ser modificada pelo seu usuário')
-        .add();
-    }
+    if (findTasks && findTasks.completed && task.completed) {
+      findTasks.completed = task.completed;
 
-    if (findTasks && findTasks.user.id === task.idUser) {
-      notification
-        .setType('INFO')
-        .setMessage('Opa! Sua status da rotina foi atualizada')
-        .add();
+      try {
+        await this.persist.commit();
 
-      if (findTasks.completed && task.completed) {
-        findTasks.completed = task.completed;
+        notification
+          .setType('INFO')
+          .setMessage('Opa! O status da sua rotina foi atualizado')
+          .add();
 
-        try {
-          await this.persist.commit();
+        const data = result
+          .setCode(200)
+          .setData(this.persist.fromObject(findTasks))
+          .setNotification(notification.build())
+          .setSuccess(true)
+          .build();
 
-          notification
-            .setType('INFO')
-            .setMessage('Opa! O status da sua rotina foi atualizado')
-            .add();
+        return data.data;
+      } catch (e) {
+        notification
+          .setType('ERROR')
+          .setMessage(
+            'Ops! Tivemos um erro interno ao salvar o novo titulo para sua rotina',
+          )
+          .add();
 
-          const data = result
-            .setCode(200)
-            .setData(this.persist.fromObject(findTasks))
-            .setNotification(notification.build())
-            .setSuccess(true)
-            .build();
+        result
+          .setCode(500)
+          .setNotification(notification.build())
+          .setSuccess(false);
+        const resultException = result.build();
 
-          return data.data;
-        } catch (e) {
-          notification
-            .setType('ERROR')
-            .setMessage(
-              'Ops! Tivemos um erro interno ao salvar o novo titulo para sua rotina',
-            )
-            .add();
-
-          result
-            .setCode(500)
-            .setNotification(notification.build())
-            .setSuccess(false);
-          const resultException = result.build();
-
-          throw new NotificationException(resultException);
-        }
+        throw new NotificationException(resultException);
       }
     }
 
@@ -507,54 +639,40 @@ export class TasksService {
         .add();
     }
 
-    if (findTasks && findTasks?.user.id !== task.idUser) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Essa rotina só pode ser modificada pelo seu usuário')
-        .add();
-    }
+    if (findTasks && findTasks.description && task.descriptionTask) {
+      findTasks.description = task.descriptionTask;
 
-    if (findTasks && findTasks?.user.id === task.idUser) {
-      notification
-        .setType('INFO')
-        .setMessage('Opa! Sua descrição foi atualizada')
-        .add();
+      try {
+        await this.persist.commit();
 
-      if (findTasks.description && task.descriptionTask) {
-        findTasks.description = task.descriptionTask;
+        notification
+          .setType('INFO')
+          .setMessage('Opa! O status da sua rotina foi atualizado')
+          .add();
 
-        try {
-          await this.persist.commit();
+        const data = result
+          .setCode(200)
+          .setData(this.persist.fromObject(findTasks))
+          .setNotification(notification.build())
+          .setSuccess(true)
+          .build();
 
-          notification
-            .setType('INFO')
-            .setMessage('Opa! O status da sua rotina foi atualizado')
-            .add();
+        return data.data;
+      } catch (e) {
+        notification
+          .setType('ERROR')
+          .setMessage(
+            'Ops! Tivemos um erro interno ao salvar o novo titulo para sua rotina',
+          )
+          .add();
 
-          const data = result
-            .setCode(200)
-            .setData(this.persist.fromObject(findTasks))
-            .setNotification(notification.build())
-            .setSuccess(true)
-            .build();
+        result
+          .setCode(500)
+          .setNotification(notification.build())
+          .setSuccess(false);
+        const resultException = result.build();
 
-          return data.data;
-        } catch (e) {
-          notification
-            .setType('ERROR')
-            .setMessage(
-              'Ops! Tivemos um erro interno ao salvar o novo titulo para sua rotina',
-            )
-            .add();
-
-          result
-            .setCode(500)
-            .setNotification(notification.build())
-            .setSuccess(false);
-          const resultException = result.build();
-
-          throw new NotificationException(resultException);
-        }
+        throw new NotificationException(resultException);
       }
     }
 
@@ -588,13 +706,6 @@ export class TasksService {
     }
 
     const findTasks = await this.taskRepo.findById(idTasks, idUser);
-
-    if (findTasks && findTasks?.user.id !== idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! não encontramos essa rotina com seu usuário')
-        .add();
-    }
 
     if (notification.verifyErrors() || notification.verifyWarnings()) {
       const resultException = result

@@ -22,8 +22,8 @@ export class CategoryRepository
     return await this.find({ id: { $in: id }, user: { id: idUser } });
   }
 
-  async findTitle(title: string, idUser: string, status: string) {
-    return await this.findOne({ title, user: { id: idUser }, status });
+  async findTitle(title: string, idUser: string) {
+    return await this.findOne({ title, user: { id: idUser } });
   }
 
   async findDeletedCategory(idUser: string): Promise<Category[]> {

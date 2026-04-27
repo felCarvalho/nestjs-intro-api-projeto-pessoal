@@ -1,14 +1,14 @@
-import { IUser } from '../../shared/core/types/types';
+import { User } from '../../users/entity/user.entity';
 import { ResultData } from '../../shared/core/result/result';
 
 //contrato para builder
 export abstract class CredentialsBuilderContracts<T> {
   abstract setIdentifier(identifier: string): this;
   abstract setProvider(provider: 'local'): this;
-  abstract setCreateDate(date: string): this;
-  abstract setUpdateDate(date: string): this;
-  abstract setUser(user: IUser): this;
-  abstract generateId(): this | void;
+  abstract setCreateDate(date: Date): this;
+  abstract setUpdateDate(date: Date): this;
+  abstract setUser(user: User): this;
+  abstract generateId(): this;
   abstract build(): ResultData<T>;
 }
 
