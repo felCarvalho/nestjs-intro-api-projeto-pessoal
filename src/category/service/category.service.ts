@@ -70,7 +70,6 @@ export class CategoryService {
     const findCategory = await this.categoryRepo.findTitle(
       category.titleCategory,
       user.id,
-      category.status,
     );
 
     if (findCategory) {
@@ -109,7 +108,7 @@ export class CategoryService {
 
     if (notification.verifyErrors() || notification.verifyWarnings()) {
       return result
-        .setCode(404)
+        .setCode(400)
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
@@ -130,7 +129,7 @@ export class CategoryService {
       throw new NotificationException(verifyCategoryCreated);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     const categoryBuilder = this.categoryBuilder();
     categoryBuilder.generateId();
@@ -313,7 +312,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    category.deleteAt = new Date().toISOString();
+    category.deleteAt = new Date();
   }
 
   async deleteCategoryRascunhos(id: string, idUser: string) {
@@ -361,7 +360,7 @@ export class CategoryService {
       throw new NotificationException(data);
     }
 
-    const date = new Date().toISOString();
+    const date = new Date();
 
     findCategory.deleteAt = date;
 
