@@ -43,6 +43,62 @@
         ]
       }
     },
+    "/home/hoje": {
+      "get": {
+        "operationId": "TasksController_getTodayTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/home/semana": {
+      "get": {
+        "operationId": "TasksController_getWeekTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/home/mes": {
+      "get": {
+        "operationId": "TasksController_getMonthTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
+    "/home/todos": {
+      "get": {
+        "operationId": "TasksController_getAllPeriodTasks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tasks"
+        ]
+      }
+    },
     "/home/detalhes/{id}": {
       "get": {
         "operationId": "TasksController_getTaskById",
@@ -330,7 +386,7 @@
       }
     },
     "/home/categorias/atualizar-tarefas/{id}": {
-      "put": {
+      "patch": {
         "operationId": "UpdateCategoryTaskOrquestradorController_updateTask",
         "parameters": [
           {
@@ -477,7 +533,14 @@
         },
         "responses": {
           "201": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
           }
         },
         "tags": [
