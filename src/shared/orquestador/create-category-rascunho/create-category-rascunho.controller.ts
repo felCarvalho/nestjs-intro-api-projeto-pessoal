@@ -16,6 +16,7 @@ export class CreateCategoryRascunhoController {
     @Body() createCategoryDto: CreateCategoryRascunhoDto,
     @User() user: { sub: string },
   ) {
+    console.log(createCategoryDto);
     return await this.createCategoryRascunhoOrquestador.createCategoryRascunho(
       createCategoryDto,
       user.sub,

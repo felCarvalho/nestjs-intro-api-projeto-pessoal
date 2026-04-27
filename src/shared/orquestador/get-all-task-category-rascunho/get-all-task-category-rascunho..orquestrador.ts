@@ -37,6 +37,8 @@ export class GetAllTaskCategoryRascunhoOrquestrador {
         this.tasksService.findAllRascunhos(idUser),
       ]);
 
+      console.log({ categories }, { tasks });
+
       notification
         .setType('INFO')
         .setMessage('Opa, suas categorias e tarefas de rascunhos aqui')

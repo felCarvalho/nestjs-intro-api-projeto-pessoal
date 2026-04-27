@@ -11,9 +11,9 @@ export abstract class UserRepositoryContract<T> {
 //contrato de userCreateBuilder
 export abstract class UserCreateBuilderContract<T> {
   abstract setName(name: string): this | void;
-  abstract setCreateDate(date: string): this | void;
-  abstract setUpdateDate(date: string): this | void;
-  abstract setDeleteDate(date: string): this | void;
+  abstract setCreateDate(date: Date): this | void;
+  abstract setUpdateDate(date: Date): this | void;
+  abstract setDeleteDate(date: Date): this | void;
   abstract generateId(): this | void;
   abstract build(): ResultData<T>;
 }
