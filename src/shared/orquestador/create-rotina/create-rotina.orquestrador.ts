@@ -83,7 +83,7 @@ export class CreateRotinaOrquestrador {
         findUser,
       );
 
-      if (!taskCreated) {
+      if (!taskCreated.success) {
         notification
           .setType('ERROR')
           .setMessage('Ops! Não conseguimos criar sua tasks')
