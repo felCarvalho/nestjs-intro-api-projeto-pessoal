@@ -62,7 +62,7 @@ export class TasksService {
 
     if (!task.descriptionTask) {
       notification
-        .setType('INFO')
+        .setType('WARNING')
         .setMessage('Ops! Descrição da sua rotina está inválida')
         .add();
     }
@@ -103,9 +103,9 @@ export class TasksService {
         .add();
     }
 
-    if (notification.verifyWarnings() || notification.verifyErrors()) {
+    if (notification.verifyErrors()) {
       return result
-        .setCode(404)
+        .setCode(400)
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
