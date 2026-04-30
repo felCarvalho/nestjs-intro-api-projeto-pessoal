@@ -62,7 +62,7 @@ export class CategoryService {
 
     if (!category.descriptionCategory) {
       notification
-        .setType('INFO')
+        .setType('WARNING')
         .setMessage('Ops! Sua descrição está inválida')
         .add();
     }
@@ -106,7 +106,7 @@ export class CategoryService {
         .add();
     }
 
-    if (notification.verifyErrors() || notification.verifyWarnings()) {
+    if (notification.verifyErrors()) {
       return result
         .setCode(400)
         .setNotification(notification.build())
