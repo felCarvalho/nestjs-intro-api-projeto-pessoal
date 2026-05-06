@@ -71,7 +71,7 @@ export class PassHashBuilder
 
     if (notification.verifyErrors()) {
       result.setNotification(notification.build());
-      result.setSuccess(true);
+      result.setSuccess(false);
       return result.build();
     }
 

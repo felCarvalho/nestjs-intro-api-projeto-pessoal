@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GetAllTaskCategoryRascunhoController } from './get-all-task-category-rascunho.controller';
-import { GetAllTaskCategoryRascunhoOrquestrador } from './get-all-task-category-rascunho..orquestrador';
+import { GetAllTaskCategoryRascunhoOrquestrador } from './get-all-task-category-rascunho.orquestrador';
 import { TasksModule } from '../../../tasks/tasks.module';
 import { CategoryModule } from '../../../category/category.module';
 import { ModuleCore } from '../../../shared/core/moduleCore/module.core';

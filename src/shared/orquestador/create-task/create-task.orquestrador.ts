@@ -26,14 +26,11 @@ export class CreateTaskOrquestador {
     const result = this.result();
 
     if (!idUser) {
-      notification.setType('ERROR').setMessage('Ops! usuário inválido').add();
+      notification.setType('ERROR').setMessage('Ops! usuário inválido').setKey('idUser').add();
     }
 
     if (!taskDto.idCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! id de categoria inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops! id de categoria inválido').setKey('idCategory').add();
     }
 
     if (notification.verifyErrors()) {
@@ -42,7 +39,6 @@ export class CreateTaskOrquestador {
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
       throw new NotificationException(data);
     }
 
@@ -78,6 +74,7 @@ export class CreateTaskOrquestador {
         notification
           .setType('INFO')
           .setMessage('Opa! Sua tarefa foi criada com sucesso')
+          .setKey('titleTask')
           .add();
 
         return result
@@ -91,6 +88,7 @@ export class CreateTaskOrquestador {
         notification
           .setType('ERROR')
           .setMessage('Ops! erro ao criar sua tarefa')
+          .setKey('titleTask')
           .add();
 
         const data = result

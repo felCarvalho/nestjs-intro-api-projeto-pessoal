@@ -28,6 +28,7 @@ import { payload } from '../../shared/core/contracts/contracts.auth';
 import { RolesRepositoryContract } from '../contracts/roles.contracts';
 import { Roles } from '../entities/roles.entity';
 import { User } from '../../users/entity/user.entity';
+import { loginSchemaValidator, LoginProps } from '../../shared/core/strategy';
 
 export class AuthService {
   constructor(
@@ -46,43 +47,23 @@ export class AuthService {
     private readonly baseAuth: BaseAuthContract,
   ) {}
 
-  verifyMinLength(data: string) {
-    const min = 8;
-
-    if (data.length < min) {
-      return true;
-    }
-
-    return false;
-  }
-
-  verifyMaxLength(data: string) {
-    const max = 150;
-
-    if (data.length > max) {
-      return true;
-    }
-
-    return false;
-  }
-
   async authValidate(loginDto: LoginDto) {
     const { identifier, password } = loginDto;
     const notification = this.notification();
     const result = this.result();
 
-    const userCredentialsBuilder = this.credentialsBuilder();
-    const userPassHashBuilder = this.passHashBuilder();
+    const loginProps: LoginProps = {
+      identifier,
+      password,
+    };
 
-    if (!identifier || !password) {
-      //criando notificação
-      notification.setType('ERROR');
-      notification.setMessage(
-        'Ops! não foi possivel realizar a sua autenticação 57',
-      );
-      notification.add();
+    const validationResult = await loginSchemaValidator.execute(loginProps);
 
-      //formatando objeto de reposta
+    if (!validationResult.success) {
+      for (const notif of validationResult.notifications) {
+        notification.setType('ERROR').setMessage(notif.message).add();
+      }
+
       result.setCode(400);
       result.setNotification(notification.build());
       result.setSuccess(false);
@@ -91,13 +72,16 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    //usando builder de credentials para fazer verificação de credenciais
+    const userCredentialsBuilder = this.credentialsBuilder();
+    const userPassHashBuilder = this.passHashBuilder();
+
     userCredentialsBuilder.setIdentifier(identifier);
     const verifyCredentials = userCredentialsBuilder.build();
 
     if (!verifyCredentials.success) {
       notification.setType('ERROR');
       notification.setMessage('Ops, email ou senha não válido 76');
+      notification.setKey('identifier');
       notification.add();
     }
 
@@ -108,6 +92,7 @@ export class AuthService {
     if (!findIdentifier) {
       notification.setType('ERROR');
       notification.setMessage('Ops, email ou senha não válido');
+      notification.setKey('identifier');
       notification.add();
     }
 
@@ -121,6 +106,7 @@ export class AuthService {
       notification.setMessage(
         'Ops! não foi possivel realizar a sua autenticação 98',
       );
+      notification.setKey('password');
       notification.add();
 
       //formatando objeto de reposta
@@ -143,6 +129,7 @@ export class AuthService {
       notification.setMessage(
         'Ops! não foi possivel realizar a sua autenticação',
       );
+      notification.setKey('password');
       notification.add();
 
       //formatando objeto de reposta
@@ -161,6 +148,7 @@ export class AuthService {
     if (!findUserRoles) {
       notification.setType('ERROR');
       notification.setMessage('Ops! role não encontrada');
+      notification.setKey('role');
       notification.add();
     }
 
@@ -170,6 +158,7 @@ export class AuthService {
       notification.setMessage(
         'Ops! não foi possivel realizar a sua autenticação 147',
       );
+      notification.setKey('role');
       notification.add();
       const erroLogAuth = notification.build();
       console.error(erroLogAuth);
@@ -204,6 +193,7 @@ export class AuthService {
       notification.setMessage(
         'Ops, tivemos um problema ao gerar seu token 178',
       );
+      notification.setKey('token');
       notification.add();
 
       result.setCode(500);
@@ -231,6 +221,7 @@ export class AuthService {
         .setMessage(
           'Ops, tivemos um problema ao gerar sua autenticação automaticamente',
         )
+        .setKey('token')
         .add();
 
       result
@@ -255,6 +246,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops, tivemos um problema ao gerar seu token')
+        .setKey('token')
         .add();
 
       result
@@ -272,6 +264,7 @@ export class AuthService {
         .setMessage(
           'Ops, Não encontramos seu usupário para criar seu token de longa duração',
         )
+        .setKey('idUser')
         .add();
 
       result
@@ -298,6 +291,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Não foi gerar seu novo token de longa duração')
+        .setKey('token')
         .add();
 
       const resultException = result
@@ -309,7 +303,11 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    notification.setType('INFO').setMessage('Refresh token criado').add();
+    notification
+      .setType('INFO')
+      .setMessage('Refresh token criado')
+      .setKey('token')
+      .add();
 
     const data = result
       .setCode(200)
@@ -331,6 +329,7 @@ export class AuthService {
         .setMessage(
           'Ops! Tivemos problemas ao salvar seu token de longa duração',
         )
+        .setKey('token')
         .add();
 
       const resultException = result
@@ -357,6 +356,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Não foi possivel renovar sua sessão automaticamente')
+        .setKey('token')
         .add();
 
       const resultException = result
@@ -374,6 +374,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Impossivel renovar sua sessão sem um rota válida')
+        .setKey('role')
         .add();
 
       const resultException = result
@@ -389,6 +390,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Seu usuário não tem acesso a essa rota')
+        .setKey('role')
         .add();
 
       const resultException = result
@@ -407,6 +409,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Não encontramos uma identificação válida ')
+        .setKey('identifier')
         .add();
 
       const resultException = result
@@ -422,6 +425,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Essa identificação não pertence ao seu usuário')
+        .setKey('identifier')
         .add();
 
       const resultException = result
@@ -436,7 +440,11 @@ export class AuthService {
     const findToken = await this.refreshRepo.findById(idToken, idUser);
 
     if (!findToken) {
-      notification.setType('ERROR').setMessage('Ops! Token inválido').add();
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Token inválido')
+        .setKey('token')
+        .add();
 
       const resultException = result
         .setCode(400)
@@ -456,6 +464,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Credencial inválida')
+        .setKey('identifier')
         .add();
 
       const resultException = result
@@ -471,6 +480,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Seu usuário não é válido')
+        .setKey('idUser')
         .add();
 
       const resultException = result
@@ -489,6 +499,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Credencial já existe')
+        .setKey('identifier')
         .add();
     }
 
@@ -517,10 +528,11 @@ export class AuthService {
       return credentialsBuild;
     }
 
-    if (this.verifyMaxLength(credentialsBuild.data.identifier)) {
+    if (credentialsBuild.data.identifier.length > 150) {
       notification
         .setType('WARNING')
         .setMessage('Ops! Sua credential esta muito longa')
+        .setKey('identifier')
         .add();
 
       const resultException = result
@@ -532,10 +544,11 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    if (!this.verifyMaxLength(credentialsBuild.data.identifier)) {
+    if (credentialsBuild.data.identifier.length <= 150) {
       notification
         .setType('INFO')
         .setMessage('Ops! Sua credencial foi criada')
+        .setKey('identifier')
         .add();
     }
 
@@ -574,6 +587,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Sua senha está inválida')
+        .setKey('password')
         .add();
 
       result
@@ -591,6 +605,7 @@ export class AuthService {
       notification
         .setType('WARNING')
         .setMessage('Ops! Senhas não coincidem')
+        .setKey('password')
         .add();
     }
 
@@ -620,20 +635,23 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Tivemos um problema ao criar sua senha')
+        .setKey('password')
         .add();
     }
 
-    if (this.verifyMinLength(passwordBuild.data.hash)) {
+    if (passwordBuild.data.hash.length < 8) {
       notification
         .setType('WARNING')
         .setMessage('Ops! Sua senha está muito curta')
+        .setKey('password')
         .add();
     }
 
-    if (this.verifyMaxLength(passwordBuild.data.hash)) {
+    if (passwordBuild.data.hash.length > 150) {
       notification
         .setType('WARNING')
         .setMessage('Ops! Sua senha está muito longa')
+        .setKey('password')
         .add();
     }
 
@@ -648,7 +666,11 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    notification.setType('INFO').setMessage('Opa! Sua senha foi criada').add();
+    notification
+      .setType('INFO')
+      .setMessage('Opa! Sua senha foi criada')
+      .setKey('password')
+      .add();
 
     const data = result
       .setCode(200)
@@ -671,6 +693,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Não conseguimos criar sua rota')
+        .setKey('role')
         .add();
 
       result
@@ -678,7 +701,7 @@ export class AuthService {
         .setNotification(notification.build())
         .setSuccess(false);
 
-      const resultException = this.result().build();
+      const resultException = result.build();
 
       throw new NotificationException(resultException);
     }
@@ -691,6 +714,7 @@ export class AuthService {
         .setMessage(
           'Ops! Tivemos um problema ao encontrar uma rota para seu usuário',
         )
+        .setKey('role')
         .add();
 
       result
@@ -715,6 +739,7 @@ export class AuthService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Não conseguimos criar sua rota')
+        .setKey('role')
         .add();
 
       result
@@ -726,8 +751,12 @@ export class AuthService {
 
       throw new NotificationException(resultException);
     }
-    if (!notification.verifyErrors() || !notification.verifyWarnings()) {
-      notification.setType('INFO').setMessage('Opa! Sua rota foi criada').add();
+    if (!notification.verifyErrors() && !notification.verifyWarnings()) {
+      notification
+        .setType('INFO')
+        .setMessage('Opa! Sua rota foi criada')
+        .setKey('role')
+        .add();
 
       const data = result
         .setCode(200)

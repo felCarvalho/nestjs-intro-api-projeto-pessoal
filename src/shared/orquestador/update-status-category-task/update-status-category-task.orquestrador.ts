@@ -27,14 +27,11 @@ export class UpdateCategoryTaskOrquestrador {
     const result = this.result();
 
     if (!idUser) {
-      notification.setType('ERROR').setMessage('Ops, usuário inválido').add();
+      notification.setType('ERROR').setMessage('Ops, usuário inválido').setKey('idUser').add();
     }
 
     if (!idCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, id de categoria inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, id de categoria inválido').setKey('idCategory').add();
     }
 
     if (notification.verifyErrors()) {
@@ -43,7 +40,6 @@ export class UpdateCategoryTaskOrquestrador {
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
       throw new NotificationException(data);
     }
 
@@ -72,6 +68,7 @@ export class UpdateCategoryTaskOrquestrador {
         notification
           .setType('INFO')
           .setMessage('Opa, Suas rotinas foram atualizadas')
+          .setKey('idCategory')
           .add();
 
         return result
@@ -84,14 +81,15 @@ export class UpdateCategoryTaskOrquestrador {
         notification
           .setType('ERROR')
           .setMessage('Ops, erro ao atualizar o status das tarefas')
+          .setKey('idCategory')
           .add();
-        result
+        const data = result
           .setNotification(notification.build())
           .setSuccess(false)
-          .setCode(500);
-        const resultException = result.build();
+          .setCode(500)
+          .build();
 
-        throw new NotificationException(resultException);
+        throw new NotificationException(data);
       }
     });
   }

@@ -4,8 +4,9 @@ import {
 } from '../contracts/contracts.notification';
 
 export class NotificationData implements NotificationContract {
-  code: number;
+  code = 400;
   message: string = '';
+  key: string = '';
   type: 'ERROR' | 'WARNING' | 'INFO' = 'INFO';
 }
 
@@ -24,6 +25,11 @@ export class NotificationBuilder implements NotificationBuilderContract {
 
   setMessage(message: string) {
     this.notificationCurrent.message = message;
+    return this;
+  }
+
+  setKey(key: string) {
+    this.notificationCurrent.key = key;
     return this;
   }
 

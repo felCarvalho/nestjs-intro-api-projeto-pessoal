@@ -17,17 +17,11 @@ export class GetAllTaskCategoryActiveOrquestrador {
     const result = this.result();
 
     if (!idCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, id da categoria inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, id da categoria inválido').setKey('idCategory').add();
     }
 
     if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, id do usuário inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, id do usuário inválido').setKey('idUser').add();
     }
 
     if (notification.verifyErrors()) {
@@ -36,10 +30,31 @@ export class GetAllTaskCategoryActiveOrquestrador {
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
       throw new NotificationException(data);
     }
 
+    const findCategory = await this.categoryService.findByCategory(
+      idCategory,
+      idUser,
+    );
+
+    if (!findCategory.success) {
+      throw new NotificationException(findCategory);
+    }
+
     const tasks = await this.tasksService.findAllTasks(idUser);
+
+    if (!tasks.success) {
+      throw new NotificationException(tasks);
+    }
+
+    notification.setType('INFO').setMessage('Opa, suas tarefas ativas').setKey('idCategory').add();
+
+    return result
+      .setCode(200)
+      .setData({ category: findCategory.data, tasks: tasks.data })
+      .setNotification(notification.build())
+      .setSuccess(true)
+      .build();
   }
 }

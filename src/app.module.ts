@@ -22,22 +22,27 @@ import { DeleteAllCategoryTaskOrquestradorModule } from './shared/orquestador/de
 import { CreateTaskOrquestradorModule } from './shared/orquestador/create-task/create-task.module';
 import { CreateTaskRascunhoModule } from './shared/orquestador/create-task-rascunho/create-task-rascunho.module';
 import { CreateCategoryRascunhoModule } from './shared/orquestador/create-category-rascunho/create-category-rascunho.module';
+import { TasksService } from './tasks/service/task.service';
+import { CategoryService } from './category/service/category.service';
+import { NotificationBuilderContract } from './shared/core/contracts/contracts.notification';
+import { ResultBuilderContract } from './shared/core/contracts/contracts.result';
+import { ModuleCore } from './shared/core/moduleCore/module.core';
 
 @Module({
   imports: [
     UsersModule,
     TasksModule,
     CategoryModule,
-    CreateRotinaOrquestradorModule,
     CreateUserOrquestradorModule,
+    CreateRotinaOrquestradorModule,
     AuthModule,
     GetAllTaskCategoryRascunhoModule,
     UpdateCategoryTaskOrquestradorModule,
     DeleteAllCategoryTaskOrquestradorModule,
-    GetAllTaskCategoryActiveOrquestrador,
     CreateTaskOrquestradorModule,
     CreateTaskRascunhoModule,
     CreateCategoryRascunhoModule,
+    ModuleCore,
     ConfigModule.forRoot({ isGlobal: true }),
     MikroOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -65,7 +70,32 @@ import { CreateCategoryRascunhoModule } from './shared/orquestador/create-catego
     }),
   ],
   controllers: [],
-  providers: [ConfigService, { provide: APP_PIPE, useClass: ValidationPipe }],
+  providers: [
+    ConfigService,
+    { provide: APP_PIPE, useClass: ValidationPipe },
+    {
+      provide: GetAllTaskCategoryActiveOrquestrador,
+      useFactory: (
+        tasksService: TasksService,
+        categoryService: CategoryService,
+        notification: () => NotificationBuilderContract,
+        result: () => ResultBuilderContract<any>,
+      ) => {
+        return new GetAllTaskCategoryActiveOrquestrador(
+          tasksService,
+          categoryService,
+          notification,
+          result,
+        );
+      },
+      inject: [
+        TasksService,
+        CategoryService,
+        NotificationBuilderContract,
+        ResultBuilderContract,
+      ],
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

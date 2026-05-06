@@ -2,11 +2,10 @@ import { Module } from '@nestjs/common';
 import { CreateRotinaOrquestrador } from './create-rotina.orquestrador';
 import { CategoryService } from '../../../category/service/category.service';
 import { TasksService } from '../../../tasks/service/task.service';
+import { UsersService } from '../../../users/service/users.service';
 import { NotificationBuilderContract } from '../../core/contracts/contracts.notification';
 import { ResultBuilderContract } from '../../core/contracts/contracts.result';
 import { TransactionContract } from '../../core/contracts/contracts.transaction';
-import { UserRepositoryContract } from '../../../users/contracts/index.contract';
-import { User } from '../../../users/entity/user.entity';
 import { ModuleCore } from '../../core/moduleCore/module.core';
 import { AuthModule } from '../../../authentication/auth.module';
 import { UsersModule } from '../../../users/users.module';
@@ -23,27 +22,27 @@ import { TasksModule } from '../../../tasks/tasks.module';
       useFactory: (
         categoryService: CategoryService,
         tasksService: TasksService,
+        usersService: UsersService,
         notification: () => NotificationBuilderContract,
         result: () => ResultBuilderContract<any>,
         transaction: TransactionContract,
-        userRepo: UserRepositoryContract<User>,
       ) => {
         return new CreateRotinaOrquestrador(
           categoryService,
           tasksService,
+          usersService,
           notification,
           result,
           transaction,
-          userRepo,
         );
       },
       inject: [
         CategoryService,
         TasksService,
+        UsersService,
         NotificationBuilderContract,
         ResultBuilderContract,
         TransactionContract,
-        UserRepositoryContract,
       ],
     },
   ],

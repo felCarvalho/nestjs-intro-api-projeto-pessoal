@@ -1,12 +1,13 @@
+import { NotificationBuilderContract } from '../../core/contracts/contracts.notification';
+import { ResultBuilderContract } from '../../core/contracts/contracts.result';
 import { TransactionContract } from '../../../shared/core/contracts/contracts.transaction';
 import { UsersService } from '../../../users/service/users.service';
 import { AuthService } from '../../../authentication/service/auth.service';
-import { NotificationBuilderContract } from '../../../shared/core/contracts/contracts.notification';
-import { ResultBuilderContract } from '../../../shared/core/contracts/contracts.result';
 import { User } from '../../../users/entity/user.entity';
 import { NotificationException } from '../../core/@custom-decorators/exception-custom/exception';
 import { CreateUserDto } from './create-user.dto';
 import { PersistContract } from '../../../shared/core/contracts/contracts.persistence';
+import { userSchemaValidator, CreateUserProps } from '../../core/strategy';
 
 export class CreateUserOrquestrador {
   constructor(
@@ -22,39 +23,43 @@ export class CreateUserOrquestrador {
     const notification = this.notification();
     const result = this.result();
 
-    if (!createUserDto?.identifier) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Sua identificação é inválida')
-        .add();
+    const userProps: CreateUserProps = {
+      name: createUserDto.name,
+      identifier: createUserDto.identifier,
+      password: createUserDto.password,
+      passwordConfirm: createUserDto.passwordConfirm,
+    };
 
-      result
+    const validationResult = await userSchemaValidator.execute(userProps);
+
+    if (!validationResult.success) {
+      for (const notif of validationResult.notifications) {
+        notification.setType('ERROR').setMessage(notif.message).add();
+      }
+    }
+
+    if (notification.verifyErrors()) {
+      const data = result
         .setCode(400)
         .setNotification(notification.build())
-        .setSuccess(false);
-
-      const resultException = result.build();
-
-      throw new NotificationException(resultException);
+        .setSuccess(false)
+        .build();
+      throw new NotificationException(data);
     }
 
     return await this.transaction.runTransaction(async () => {
       const userCreated = await this.userService.createUser(createUserDto.name);
 
-      if (!userCreated) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops! Não foi possível criar o usuário')
-          .add();
-
-        result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false);
-
-        const resultException = result.build();
-
-        throw new NotificationException(resultException);
+      if (!userCreated || !userCreated.success) {
+        notification.setType('ERROR').setMessage('Ops! Não foi possível criar o usuário').setKey('name').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(400)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       const credentialsCreated = await this.authService.createCredentials(
@@ -62,20 +67,16 @@ export class CreateUserOrquestrador {
         userCreated.data,
       );
 
-      if (!credentialsCreated) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops! Não foi possível criar suas credenciais')
-          .add();
-
-        result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false);
-
-        const resultException = this.result().build();
-
-        throw new NotificationException(resultException);
+      if (!credentialsCreated || !credentialsCreated.success) {
+        notification.setType('ERROR').setMessage('Ops! Não foi possível criar suas credenciais').setKey('identifier').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(400)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       const passHashCreated = await this.authService.createPassword(
@@ -84,40 +85,32 @@ export class CreateUserOrquestrador {
         userCreated.data,
       );
 
-      if (!passHashCreated) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops! Não foi possível criar suas credenciais')
-          .add();
-
-        result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false);
-
-        const resultException = result.build();
-
-        throw new NotificationException(resultException);
+      if (!passHashCreated || !passHashCreated.success) {
+        notification.setType('ERROR').setMessage('Ops! Não foi possível criar sua senha').setKey('password').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(400)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
-      const userRoulesCreated = await this.authService.createRoles(
+      const userRolesCreated = await this.authService.createRoles(
         userCreated.data,
       );
 
-      if (!userRoulesCreated) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops! Não foi possível criar suas credenciais')
-          .add();
-
-        result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false);
-
-        const resultException = result.build();
-
-        throw new NotificationException(resultException);
+      if (!userRolesCreated || !userRolesCreated.success) {
+        notification.setType('ERROR').setMessage('Ops! Não foi possível criar sua role').setKey('role').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(400)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       try {
@@ -126,6 +119,7 @@ export class CreateUserOrquestrador {
         notification
           .setType('INFO')
           .setMessage('Opa! Seu usuário já foi criado')
+          .setKey('name')
           .add();
 
         return result
@@ -135,22 +129,22 @@ export class CreateUserOrquestrador {
           .setSuccess(true)
           .build();
       } catch (e) {
+        console.error(e);
         notification
           .setType('ERROR')
           .setMessage(
-            'Ops! Não foi possível criar sue usuário, tente novamente mais tarde',
+            'Ops! Não foi possível criar seu usuário, tente novamente mais tarde',
           )
+          .setKey('name')
           .add();
 
-        result
+        const data = result
           .setCode(500)
           .setNotification(notification.build())
-          .setSuccess(false);
+          .setSuccess(false)
+          .build();
 
-        const resultException = result.build();
-
-        console.error(e);
-        throw new NotificationException(resultException);
+        throw new NotificationException(data);
       }
     });
   }

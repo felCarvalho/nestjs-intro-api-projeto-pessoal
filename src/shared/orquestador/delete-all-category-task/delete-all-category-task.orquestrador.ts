@@ -22,17 +22,11 @@ export class DeleteAllCategoryTaskOrquestrador {
     const result = this.result();
 
     if (!id) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, id de categoria inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, id de categoria inválido').setKey('idCategory').add();
     }
 
     if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, id de usuario inválido')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, id de usuario inválido').setKey('idUser').add();
     }
 
     if (notification.verifyErrors()) {
@@ -41,26 +35,22 @@ export class DeleteAllCategoryTaskOrquestrador {
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
       throw new NotificationException(data);
     }
 
     return await this.transaction.runTransaction(async () => {
       const findUser = await this.userService.findUserById(idUser);
 
-      if (!findUser) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops, usuário não encontrado')
-          .add();
-
-        const data = result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false)
-          .build();
-
-        throw new NotificationException(data);
+      if (!findUser || !findUser.success) {
+        notification.setType('ERROR').setMessage('Ops, usuário não encontrado').setKey('idUser').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(404)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       const findCategory = await this.categoryService.findByCategory(
@@ -68,19 +58,16 @@ export class DeleteAllCategoryTaskOrquestrador {
         idUser,
       );
 
-      if (!findCategory) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops, categoria não encontrada')
-          .add();
-
-        const data = result
-          .setCode(400)
-          .setNotification(notification.build())
-          .setSuccess(false)
-          .build();
-
-        throw new NotificationException(data);
+      if (!findCategory || !findCategory.success) {
+        notification.setType('ERROR').setMessage('Ops, categoria não encontrada').setKey('idCategory').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(404)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       try {
@@ -90,6 +77,7 @@ export class DeleteAllCategoryTaskOrquestrador {
         notification
           .setType('INFO')
           .setMessage('Todas as tarefas foram deletadas')
+          .setKey('idCategory')
           .add();
 
         return result
@@ -103,6 +91,7 @@ export class DeleteAllCategoryTaskOrquestrador {
         notification
           .setType('ERROR')
           .setMessage('Ops, erro ao deletar suas tarefas')
+          .setKey('idCategory')
           .add();
 
         const data = result
