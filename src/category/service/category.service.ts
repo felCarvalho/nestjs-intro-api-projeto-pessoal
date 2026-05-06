@@ -11,9 +11,12 @@ import { User } from '../../users/entity/user.entity';
 import {
   categorySchemaValidator,
   updateCategorySchemaValidator,
+  deleteCategorySchemaValidator,
   CreateCategoryProps,
   UpdateCategoryProps,
+  DeleteCategoryProps,
 } from '../../shared/core/strategy';
+import { isRequired, matches } from '../../shared/core/validators';
 
 export class CategoryService {
   constructor(
@@ -29,7 +32,11 @@ export class CategoryService {
     const notification = this.notification();
 
     if (!user.id) {
-      notification.setType('ERROR').setKey('idUser').setMessage('Ops, usuário inválido!').add();
+      notification
+        .setType('ERROR')
+        .setKey('idUser')
+        .setMessage('Ops, usuário inválido!')
+        .add();
 
       const data = result
         .setCode(400)
@@ -101,15 +108,23 @@ export class CategoryService {
 
     this.categoryRepo.createCategory(categoryBuild.data);
 
-    return result.setCode(200).setData(categoryBuild.data).setSuccess(true).build();
+    return result
+      .setCode(200)
+      .setData(categoryBuild.data)
+      .setSuccess(true)
+      .build();
   }
 
   async findByCategory(categoryId: string, idUser: string) {
     const notification = this.notification();
     const result = this.result();
 
-    if (!idUser) {
-      notification.setType('ERROR').setKey('idUser').setMessage('Ops, usuário inválido').add();
+    if (!isRequired(idUser)) {
+      notification
+        .setType('ERROR')
+        .setKey('idUser')
+        .setMessage('Ops, usuário inválido')
+        .add();
       const data = result
         .setCode(400)
         .setNotification(notification.build())
@@ -148,7 +163,7 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!idUser) {
+    if (!isRequired(idUser)) {
       notification
         .setType('ERROR')
         .setMessage('Ops, Seu usuario não foi encontrado')
@@ -193,7 +208,7 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!idUser) {
+    if (!isRequired(idUser)) {
       notification
         .setType('ERROR')
         .setMessage('Ops, Seu usuario não foi encontrado')
@@ -210,35 +225,27 @@ export class CategoryService {
 
     const findAllRascunhos = await this.categoryRepo.findAllRascunhos(idUser);
 
-    return result.setCode(200).setData(findAllRascunhos).setSuccess(true).build();
+    return result
+      .setCode(200)
+      .setData(findAllRascunhos)
+      .setSuccess(true)
+      .build();
   }
 
   async deleteCategoryAllTasks(id: string, idUser: string) {
     const notification = this.notification();
     const result = this.result();
 
-    if (!id) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, credenciais inválidas')
-        .add();
-    }
+    const deleteProps: DeleteCategoryProps = { id, idUser };
+    const validationResult =
+      await deleteCategorySchemaValidator.execute(deleteProps);
 
-    if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, seu usuario não foi encontrado')
-        .add();
-    }
-
-    if (notification.verifyErrors()) {
-      const data = result
+    if (!validationResult.success) {
+      return result
         .setCode(400)
-        .setNotification(notification.build())
+        .setNotification(validationResult.notifications)
         .setSuccess(false)
         .build();
-
-      throw new NotificationException(data);
     }
 
     const category = await this.categoryRepo.findById(id, idUser);
@@ -265,28 +272,16 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!id) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, credenciais inválidas')
-        .add();
-    }
+    const deleteProps: DeleteCategoryProps = { id, idUser };
+    const validationResult =
+      await deleteCategorySchemaValidator.execute(deleteProps);
 
-    if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, seu usuario não foi encontrado')
-        .add();
-    }
-
-    if (notification.verifyErrors()) {
-      const data = result
+    if (!validationResult.success) {
+      return result
         .setCode(400)
-        .setNotification(notification.build())
+        .setNotification(validationResult.notifications)
         .setSuccess(false)
         .build();
-
-      throw new NotificationException(data);
     }
 
     const findCategory = await this.categoryRepo.findById(id, idUser);
@@ -349,16 +344,18 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!id) {
+    if (!isRequired(id)) {
       notification
         .setType('ERROR')
+        .setKey('idCategory')
         .setMessage('Ops, credenciais inválidas')
         .add();
     }
 
-    if (!idUser) {
+    if (!isRequired(idUser)) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops, credenciais inválidas')
         .add();
     }
@@ -401,14 +398,12 @@ export class CategoryService {
         .setMessage('Opa, categoria atualizado')
         .add();
 
-      const data = result
+      return result
         .setCode(200)
         .setData(findCategory)
         .setNotification(notification.build())
         .setSuccess(true)
         .build();
-
-      return data;
     } catch (e) {
       console.error(e);
 
@@ -431,26 +426,37 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    console.log(title, id, idUser);
-
-    if (!id) {
+    if (!isRequired(id)) {
       notification
         .setType('ERROR')
+        .setKey('idCategory')
         .setMessage('Ops, credenciais inválidas')
         .add();
     }
 
-    if (!title) {
+    if (!isRequired(title)) {
       notification
         .setType('ERROR')
+        .setKey('titleCategory')
         .setMessage('Ops, titulo inválido para ser atualizado')
         .add();
     }
 
-    if (!idUser) {
+    if (!isRequired(idUser)) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops, credenciais inválidas')
+        .add();
+    }
+
+    const existingCategory = await this.categoryRepo.findTitle(title, idUser);
+
+    if (existingCategory && !matches(existingCategory.id, id)) {
+      notification
+        .setType('ERROR')
+        .setKey('titleCategory')
+        .setMessage('Ops! Titulo da sua categoria já existe')
         .add();
     }
 
@@ -492,14 +498,12 @@ export class CategoryService {
         .setMessage('Opa, o titulo da sua categoria foi atualizado ')
         .add();
 
-      const data = result
+      return result
         .setCode(200)
         .setData(findCategory)
         .setNotification(notification.build())
         .setSuccess(true)
         .build();
-
-      return data;
     } catch (e) {
       console.error(e);
       notification
@@ -525,23 +529,26 @@ export class CategoryService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!id) {
+    if (!isRequired(id)) {
       notification
         .setType('ERROR')
+        .setKey('idCategory')
         .setMessage('Ops, credenciais inválidas')
         .add();
     }
 
-    if (!description) {
+    if (!isRequired(description)) {
       notification
         .setType('ERROR')
-        .setMessage('Ops, title inválido para ser atualizado')
+        .setKey('descriptionCategory')
+        .setMessage('Ops, descrição inválida para ser atualizada')
         .add();
     }
 
-    if (!idUser) {
+    if (!isRequired(idUser)) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops, credenciais inválidas')
         .add();
     }
@@ -584,14 +591,12 @@ export class CategoryService {
         .setMessage('Opa, a descrição da sua categoria foi atualizado ')
         .add();
 
-      const data = result
+      return result
         .setCode(200)
         .setData(findCategory)
         .setNotification(notification.build())
         .setSuccess(true)
         .build();
-
-      return data;
     } catch (e) {
       console.error(e);
       notification
