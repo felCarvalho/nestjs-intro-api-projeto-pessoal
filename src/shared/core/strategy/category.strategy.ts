@@ -75,3 +75,21 @@ export const updateCategoryRules: Rule<UpdateCategoryProps>[] = [
     runValidate: (data) => isInEnum(data.status, ['ativa', 'inativa']),
   },
 ];
+
+export interface DeleteCategoryProps {
+  id: string;
+  idUser: string;
+}
+
+export const deleteCategoryRules: Rule<DeleteCategoryProps>[] = [
+  {
+    key: 'id',
+    error: 'Ops, credenciais inválidas',
+    runValidate: (data) => isRequired(data.id),
+  },
+  {
+    key: 'idUser',
+    error: 'Ops, seu usuário não foi encontrado',
+    runValidate: (data) => isRequired(data.idUser),
+  },
+];

@@ -6,6 +6,8 @@ import {
   CreateCategoryProps,
   updateCategoryRules,
   UpdateCategoryProps,
+  deleteCategoryRules,
+  DeleteCategoryProps,
 } from './category.strategy';
 import {
   taskRules,
@@ -14,6 +16,12 @@ import {
   CreateTaskProps,
   updateTaskRules,
   UpdateTaskProps,
+  deleteTaskRules,
+  findTaskRules,
+  searchTaskRules,
+  DeleteTaskProps,
+  FindTaskProps,
+  SearchTaskProps,
 } from './task.strategy';
 import {
   userRules,
@@ -71,16 +79,28 @@ export const userNameSchemaValidator =
   makeValidator<UserNameProps>(userNameRules);
 export const rotinaSchemaValidator =
   makeValidator<CreateRotinaProps>(rotinaRules);
+export const deleteCategorySchemaValidator =
+  makeValidator<DeleteCategoryProps>(deleteCategoryRules);
+export const deleteTaskSchemaValidator =
+  makeValidator<DeleteTaskProps>(deleteTaskRules);
+export const findTaskSchemaValidator =
+  makeValidator<FindTaskProps>(findTaskRules);
+export const searchTaskSchemaValidator =
+  makeValidator<SearchTaskProps>(searchTaskRules);
 
 export {
   categoryRules,
   categoryFieldRules,
   categoryBusinessRules,
   updateCategoryRules,
+  deleteCategoryRules,
   taskRules,
   taskFieldRules,
   taskBusinessRules,
   updateTaskRules,
+  deleteTaskRules,
+  findTaskRules,
+  searchTaskRules,
   userRules,
   loginRules,
   userNameRules,
@@ -90,8 +110,12 @@ export {
 export type {
   CreateCategoryProps,
   UpdateCategoryProps,
+  DeleteCategoryProps,
   CreateTaskProps,
   UpdateTaskProps,
+  DeleteTaskProps,
+  FindTaskProps,
+  SearchTaskProps,
   CreateUserProps,
   LoginProps,
   UserNameProps,

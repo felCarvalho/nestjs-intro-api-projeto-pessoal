@@ -76,3 +76,57 @@ export const updateTaskRules: Rule<UpdateTaskProps>[] = [
       isInEnum(data.completed, ['Concluída', 'Incompleta']),
   },
 ];
+
+export interface DeleteTaskProps {
+  idTask: string;
+  idUser: string;
+}
+
+export interface FindTaskProps {
+  idUser: string;
+  idTasks: string;
+}
+
+export interface SearchTaskProps {
+  idUser: string;
+  search: string;
+}
+
+export const deleteTaskRules: Rule<DeleteTaskProps>[] = [
+  {
+    key: 'idTask',
+    error: 'Ops! Não conseguimos deletar sua rotina',
+    runValidate: (data) => isRequired(data.idTask),
+  },
+  {
+    key: 'idUser',
+    error: 'Ops! Não conseguimos deletar sua rotina',
+    runValidate: (data) => isRequired(data.idUser),
+  },
+];
+
+export const findTaskRules: Rule<FindTaskProps>[] = [
+  {
+    key: 'idUser',
+    error: 'Ops! Id do usuário inválido',
+    runValidate: (data) => isRequired(data.idUser),
+  },
+  {
+    key: 'idTasks',
+    error: 'Ops! Id da tarefa inválido',
+    runValidate: (data) => isRequired(data.idTasks),
+  },
+];
+
+export const searchTaskRules: Rule<SearchTaskProps>[] = [
+  {
+    key: 'idUser',
+    error: 'Ops! usuário inválido',
+    runValidate: (data) => isRequired(data.idUser),
+  },
+  {
+    key: 'search',
+    error: 'Ops! não encontramos nenhuma rotina',
+    runValidate: (data) => isRequired(data.search),
+  },
+];

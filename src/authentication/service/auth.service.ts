@@ -29,6 +29,7 @@ import { RolesRepositoryContract } from '../contracts/roles.contracts';
 import { Roles } from '../entities/roles.entity';
 import { User } from '../../users/entity/user.entity';
 import { loginSchemaValidator, LoginProps } from '../../shared/core/strategy';
+import { matches } from '../../shared/core/validators';
 
 export class AuthService {
   constructor(
@@ -386,7 +387,7 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    if (findUserRole.user.id !== idUser) {
+    if (!matches(findUserRole.user.id, idUser)) {
       notification
         .setType('ERROR')
         .setMessage('Ops! Seu usuário não tem acesso a essa rota')
@@ -421,7 +422,7 @@ export class AuthService {
       throw new NotificationException(resultException);
     }
 
-    if (findCredentials.user.id !== idUser) {
+    if (!matches(findCredentials.user.id, idUser)) {
       notification
         .setType('ERROR')
         .setMessage('Ops! Essa identificação não pertence ao seu usuário')
