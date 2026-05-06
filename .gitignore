@@ -3,6 +3,9 @@
 /node_modules
 /build
 
+# opencode
+opencode.json
+
 # Logs
 logs
 *.log
