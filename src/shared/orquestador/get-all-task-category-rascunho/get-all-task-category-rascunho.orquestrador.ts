@@ -17,18 +17,15 @@ export class GetAllTaskCategoryRascunhoOrquestrador {
     const result = this.resultBuilder();
 
     if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, Seu usuario não foi encontrado')
-        .add();
-
-      const data = result
-        .setCode(400)
-        .setNotification(notification.build())
-        .setSuccess(true)
-        .build();
-
-      throw new NotificationException(data);
+      notification.setType('ERROR').setMessage('Ops, Seu usuario não foi encontrado').setKey('idUser').add();
+      if (notification.verifyErrors()) {
+        const data = result
+          .setCode(400)
+          .setNotification(notification.build())
+          .setSuccess(false)
+          .build();
+        throw new NotificationException(data);
+      }
     }
 
     try {
@@ -37,11 +34,10 @@ export class GetAllTaskCategoryRascunhoOrquestrador {
         this.tasksService.findAllRascunhos(idUser),
       ]);
 
-      console.log({ categories }, { tasks });
-
       notification
         .setType('INFO')
         .setMessage('Opa, suas categorias e tarefas de rascunhos aqui')
+        .setKey('idUser')
         .add();
 
       const data = {
@@ -60,6 +56,7 @@ export class GetAllTaskCategoryRascunhoOrquestrador {
       notification
         .setType('ERROR')
         .setMessage('Ops, tivemos um problema ao ler suas informações')
+        .setKey('idUser')
         .add();
 
       const data = result

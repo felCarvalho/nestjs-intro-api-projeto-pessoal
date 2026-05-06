@@ -17,9 +17,11 @@ export class CreateRotinaOrquestradorController {
     @User() user: { sub: string },
     @Body() createRotinaDto: CreateRotinaDto,
   ) {
-    return await this.createRotinaOrquestrador.createCategoryAndTasks(
+    const tasks = await this.createRotinaOrquestrador.createCategoryAndTasks(
       createRotinaDto,
       user.sub,
     );
+
+    return tasks;
   }
 }

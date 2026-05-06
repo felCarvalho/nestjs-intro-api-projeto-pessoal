@@ -11,6 +11,12 @@ import { User } from '../../users/entity/user.entity';
 import { Category } from '../../category/entity/category.entity';
 import { UpdateTaskDto } from '../dto/update-task.dto';
 import { CreateTaskDto } from '../dto/create-task.dto';
+import {
+  taskSchemaValidator,
+  updateTaskSchemaValidator,
+  CreateTaskProps,
+  UpdateTaskProps,
+} from '../../shared/core/strategy';
 
 export class TasksService {
   constructor(
@@ -21,92 +27,39 @@ export class TasksService {
     private readonly taskBuilder: () => TaskBuilderContract<Tasks>,
   ) {}
 
-  verifyMaxLength(data: string, maxLength: number) {
-    if (data.length > maxLength) {
-      return true;
-    }
-
-    return false;
-  }
-
-  verifyMinLength(data: string, minLength: number) {
-    if (data.length < minLength) {
-      return true;
-    }
-
-    return false;
-  }
-
   private async createTaskCore(task: CreateTaskDto, user: User) {
-    const notification = this.notification();
     const result = this.result();
+    const notification = this.notification();
 
     if (!user.id) {
-      notification.setType('ERROR').setMessage('Ops! Usuário inválido').add();
-    }
-
-    if (!task.titleTask) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Titulo da sua rotina está inválido')
-        .add();
+      notification.setType('ERROR').setKey('idUser').setMessage('Ops, usuario inválido!').add();
     }
 
     if (notification.verifyErrors()) {
-      return result
+      const data = result
         .setCode(400)
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-    }
 
-    if (!task.descriptionTask) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Descrição da sua rotina está inválida')
-        .add();
+      throw new NotificationException(data);
     }
 
     const findTask = await this.taskRepo.findTitle(task.titleTask, user.id);
 
-    if (findTask) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Essa rotina já existe')
-        .add();
+    const taskProps: CreateTaskProps = {
+      titleTask: task.titleTask,
+      descriptionTask: task.descriptionTask,
+      status: task.status,
+      titleAlreadyExists: !!findTask,
+    };
 
-      return result
-        .setCode(409)
-        .setNotification(notification.build())
-        .setSuccess(false)
-        .build();
-    }
+    const validationResult = await taskSchemaValidator.execute(taskProps);
 
-    if (this.verifyMaxLength(task.titleTask, 255)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Titulo da sua rotina está muito longo')
-        .add();
-    }
-
-    if (this.verifyMinLength(task.titleTask, 5)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Sua descrição está muito longa')
-        .add();
-    }
-
-    if (this.verifyMaxLength(task.descriptionTask, 400)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Sua descrição está muito longa')
-        .add();
-    }
-
-    if (notification.verifyErrors()) {
+    if (!validationResult.success) {
       return result
         .setCode(400)
-        .setNotification(notification.build())
+        .setNotification(validationResult.notifications)
         .setSuccess(false)
         .build();
     }
@@ -120,7 +73,7 @@ export class TasksService {
     const taskCreated = await this.createTaskCore(task, user);
 
     if (!taskCreated.success) {
-      throw new NotificationException(taskCreated);
+      return taskCreated;
     }
 
     const date = new Date();
@@ -145,7 +98,7 @@ export class TasksService {
 
     this.taskRepo.createTask(taskBuild.data);
 
-    return result.setData(taskBuild.data).setSuccess(true).build();
+    return result.setCode(200).setData(taskBuild.data).setSuccess(true).build();
   }
 
   async filterTodayTasks(idUser: string) {
@@ -301,6 +254,7 @@ export class TasksService {
     if (!task.idUser) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops! id de usuário inválido')
         .add();
     }
@@ -308,6 +262,7 @@ export class TasksService {
     if (!task.idTask) {
       notification
         .setType('ERROR')
+        .setKey('idTask')
         .setMessage('Ops! id de tarefa inválido')
         .add();
     }
@@ -371,8 +326,9 @@ export class TasksService {
           .setSuccess(true)
           .build();
 
-        return data.data;
+        return data;
       } catch (e) {
+        console.error(e);
         notification
           .setType('ERROR')
           .setMessage(
@@ -450,7 +406,7 @@ export class TasksService {
       await this.persist.commit();
 
       notification
-        .setType('ERROR')
+        .setType('INFO')
         .setMessage('Opa, Sua rotina foi deletada')
         .add();
 
@@ -458,10 +414,13 @@ export class TasksService {
         .setCode(200)
         .setData(this.persist.fromObject(findTasks))
         .setNotification(notification.build())
+        .setSuccess(true)
         .build();
 
       return data;
     } catch (e) {
+      console.error(e);
+
       notification
         .setType('ERROR')
         .setMessage('Ops! Ocorreu um erro ao deletar sua rotina')
@@ -515,14 +474,8 @@ export class TasksService {
     if (!task.idUser) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops! id de usuário inválido')
-        .add();
-    }
-
-    if (task.completed !== 'Concluída' && task.completed !== 'Incompleta') {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Seu status está inválido para atualização')
         .add();
     }
 
@@ -565,8 +518,10 @@ export class TasksService {
           .setSuccess(true)
           .build();
 
-        return data.data;
+        return data;
       } catch (e) {
+        console.error(e);
+
         notification
           .setType('ERROR')
           .setMessage(
@@ -602,7 +557,8 @@ export class TasksService {
     if (!task.idUser) {
       notification
         .setType('ERROR')
-        .setMessage('Ops! id de usuário é inválido')
+        .setKey('idUser')
+        .setMessage('Ops! id de usuário inválido')
         .add();
     }
 
@@ -657,8 +613,10 @@ export class TasksService {
           .setSuccess(true)
           .build();
 
-        return data.data;
+        return data;
       } catch (e) {
+        console.error(e);
+
         notification
           .setType('ERROR')
           .setMessage(
@@ -722,6 +680,7 @@ export class TasksService {
         .setCode(200)
         .setData(findTasks)
         .setSuccess(true)
+        .setNotification(notification.build())
         .build();
 
       return data;
@@ -743,6 +702,7 @@ export class TasksService {
     if (!idUser) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops! id de usuário inválido')
         .add();
     }
@@ -752,6 +712,7 @@ export class TasksService {
     if (!findTasks) {
       notification
         .setType('ERROR')
+        .setKey('idUser')
         .setMessage('Ops! Não conseguimos encontrar nada')
         .add();
     }
@@ -771,6 +732,7 @@ export class TasksService {
         .setCode(200)
         .setData(findTasks)
         .setSuccess(true)
+        .setNotification(notification.build())
         .build();
 
       return data;
@@ -790,12 +752,13 @@ export class TasksService {
     const result = this.result();
 
     if (!idUser) {
-      notification.setType('ERROR').setMessage('Ops! usuário inválido').add();
+      notification.setType('ERROR').setKey('idUser').setMessage('Ops! usuário inválido').add();
     }
 
     if (!search) {
       notification
         .setType('ERROR')
+        .setKey('search')
         .setMessage('Ops! não encontramos nenhuma rotina')
         .add();
     }
@@ -815,6 +778,7 @@ export class TasksService {
       .setCode(200)
       .setSuccess(true)
       .setData(searchData)
+      .setNotification(notification.build())
       .build();
 
     return data;
@@ -825,7 +789,7 @@ export class TasksService {
     const result = this.result();
 
     if (!id) {
-      notification.setType('ERROR').setMessage('Ops, id inválido').add();
+      notification.setType('ERROR').setKey('id').setMessage('Ops, id inválido').add();
 
       const data = result
         .setCode(404)
@@ -837,12 +801,34 @@ export class TasksService {
     }
 
     const findAllRascunhos = await this.taskRepo.findAllRascunhos(id);
-    const data = result.setSuccess(true).setData(findAllRascunhos).build();
+    const data = result
+      .setCode(200)
+      .setSuccess(true)
+      .setData(findAllRascunhos)
+      .build();
 
     return data;
   }
 
   async taskUpdate(task: UpdateTaskDto) {
+    const updateProps: UpdateTaskProps = {
+      titleTask: task.titleTask,
+      descriptionTask: task.descriptionTask,
+      completed: task.completed,
+    };
+
+    const validationResult =
+      await updateTaskSchemaValidator.execute(updateProps);
+
+    if (!validationResult.success) {
+      const result = this.result();
+      return result
+        .setCode(400)
+        .setNotification(validationResult.notifications)
+        .setSuccess(false)
+        .build();
+    }
+
     if (task.titleTask && task.idTask && task.idUser) {
       return await this.updateTasksTitle(task);
     }

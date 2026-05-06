@@ -8,6 +8,12 @@ import { CreateCategoryDto } from '../dto/create-category.dto';
 import { PersistContract } from '../../shared/core/contracts/contracts.persistence';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { User } from '../../users/entity/user.entity';
+import {
+  categorySchemaValidator,
+  updateCategorySchemaValidator,
+  CreateCategoryProps,
+  UpdateCategoryProps,
+} from '../../shared/core/strategy';
 
 export class CategoryService {
   constructor(
@@ -18,53 +24,20 @@ export class CategoryService {
     private readonly persist: PersistContract<Category>,
   ) {}
 
-  verifyMaxLength(data: string, maxLength: number) {
-    if (data.length > maxLength) {
-      return true;
-    }
-
-    return false;
-  }
-
-  verifyMinLength(data: string, minLength: number) {
-    if (data.length < minLength) {
-      return true;
-    }
-
-    return false;
-  }
-
   private async createCategoryCore(category: CreateCategoryDto, user: User) {
-    const notification = this.notification();
     const result = this.result();
+    const notification = this.notification();
 
     if (!user.id) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! id de usuário inválido')
-        .add();
-    }
+      notification.setType('ERROR').setKey('idUser').setMessage('Ops, usuário inválido!').add();
 
-    if (!category.titleCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! titulo da rotina inválido')
-        .add();
-    }
-
-    if (notification.verifyErrors()) {
-      return result
+      const data = result
         .setCode(400)
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-    }
 
-    if (!category.descriptionCategory) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Sua descrição está inválida')
-        .add();
+      throw new NotificationException(data);
     }
 
     const findCategory = await this.categoryRepo.findTitle(
@@ -72,52 +45,25 @@ export class CategoryService {
       user.id,
     );
 
-    if (findCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Já existe uma categoria com esse mesmo titulo')
-        .add();
+    const categoryProps: CreateCategoryProps = {
+      titleCategory: category.titleCategory,
+      descriptionCategory: category.descriptionCategory,
+      status: category.status,
+      titleAlreadyExists: !!findCategory,
+    };
 
-      return result
-        .setCode(409)
-        .setNotification(notification.build())
-        .setSuccess(false)
-        .build();
-    }
+    const validationResult =
+      await categorySchemaValidator.execute(categoryProps);
 
-    if (this.verifyMinLength(category.titleCategory, 5)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Titulo da categoria está muito curto')
-        .add();
-    }
-
-    if (this.verifyMaxLength(category.titleCategory, 255)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Titulo da categoria está muito longo')
-        .add();
-    }
-
-    if (this.verifyMaxLength(category.descriptionCategory, 400)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Descrição está muito longa')
-        .add();
-    }
-
-    if (notification.verifyErrors()) {
+    if (!validationResult.success) {
       return result
         .setCode(400)
-        .setNotification(notification.build())
+        .setNotification(validationResult.notifications)
         .setSuccess(false)
         .build();
     }
 
-    return result
-      .setSuccess(true)
-      .setNotification(notification.build())
-      .build();
+    return result.setSuccess(true).build();
   }
 
   async createCategory(category: CreateCategoryDto, user: User) {
@@ -126,7 +72,7 @@ export class CategoryService {
     const verifyCategoryCreated = await this.createCategoryCore(category, user);
 
     if (!verifyCategoryCreated.success) {
-      throw new NotificationException(verifyCategoryCreated);
+      return verifyCategoryCreated;
     }
 
     const date = new Date();
@@ -155,7 +101,7 @@ export class CategoryService {
 
     this.categoryRepo.createCategory(categoryBuild.data);
 
-    return result.setData(categoryBuild.data).setSuccess(true).build();
+    return result.setCode(200).setData(categoryBuild.data).setSuccess(true).build();
   }
 
   async findByCategory(categoryId: string, idUser: string) {
@@ -163,7 +109,7 @@ export class CategoryService {
     const result = this.result();
 
     if (!idUser) {
-      notification.setType('ERROR').setMessage('Ops, usuário inválido').add();
+      notification.setType('ERROR').setKey('idUser').setMessage('Ops, usuário inválido').add();
       const data = result
         .setCode(400)
         .setNotification(notification.build())
@@ -264,7 +210,7 @@ export class CategoryService {
 
     const findAllRascunhos = await this.categoryRepo.findAllRascunhos(idUser);
 
-    return result.setData(findAllRascunhos).setSuccess(true).build();
+    return result.setCode(200).setData(findAllRascunhos).setSuccess(true).build();
   }
 
   async deleteCategoryAllTasks(id: string, idUser: string) {
@@ -410,13 +356,6 @@ export class CategoryService {
         .add();
     }
 
-    if (status && status !== 'Ativa' && status !== 'Inativa') {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops, status inválido para ser atualizado')
-        .add();
-    }
-
     if (!idUser) {
       notification
         .setType('ERROR')
@@ -424,7 +363,7 @@ export class CategoryService {
         .add();
     }
 
-    if (notification.verifyErrors() || notification.verifyWarnings()) {
+    if (notification.verifyErrors()) {
       const data = result
         .setCode(400)
         .setNotification(notification.build())
@@ -675,6 +614,24 @@ export class CategoryService {
     idCategory: string,
     idUser: string,
   ) {
+    const updateProps: UpdateCategoryProps = {
+      titleCategory: updateCategory.titleCategory,
+      descriptionCategory: updateCategory.descriptionCategory,
+      status: updateCategory.status,
+    };
+
+    const validationResult =
+      await updateCategorySchemaValidator.execute(updateProps);
+
+    if (!validationResult.success) {
+      const result = this.result();
+      return result
+        .setCode(400)
+        .setNotification(validationResult.notifications)
+        .setSuccess(false)
+        .build();
+    }
+
     if (updateCategory.titleCategory && idCategory) {
       return await this.categoryUpdateTitle(
         updateCategory?.titleCategory,

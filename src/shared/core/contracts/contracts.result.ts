@@ -1,5 +1,5 @@
-import { ResultData } from '../result/result';
 import { NotificationContract } from './contracts.notification';
+import { ResultData } from '../result/result';
 
 export abstract class ResultContract<T> {
   abstract data: T;

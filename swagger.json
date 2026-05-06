@@ -309,37 +309,6 @@
         ]
       }
     },
-    "/home/criar-rotina": {
-      "post": {
-        "operationId": "CreateRotinaOrquestradorController_createTask",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRotinaDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "CreateRotinaOrquestrador"
-        ]
-      }
-    },
     "/criar-conta": {
       "post": {
         "operationId": "UserOrquestradoController_createUser",
@@ -368,6 +337,37 @@
         },
         "tags": [
           "UserOrquestrado"
+        ]
+      }
+    },
+    "/home/criar-rotina": {
+      "post": {
+        "operationId": "CreateRotinaOrquestradorController_createTask",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRotinaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "CreateRotinaOrquestrador"
         ]
       }
     },
@@ -610,37 +610,6 @@
           "status"
         ]
       },
-      "CreateRotinaDto": {
-        "type": "object",
-        "properties": {
-          "titleTask": {
-            "type": "string"
-          },
-          "descriptionTask": {
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 255
-          },
-          "titleCategory": {
-            "type": "string"
-          },
-          "descriptionCategory": {
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 255
-          },
-          "status": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "titleTask",
-          "descriptionTask",
-          "titleCategory",
-          "descriptionCategory",
-          "status"
-        ]
-      },
       "CreateUserDto": {
         "type": "object",
         "properties": {
@@ -671,6 +640,37 @@
           "identifier",
           "password",
           "passwordConfirm"
+        ]
+      },
+      "CreateRotinaDto": {
+        "type": "object",
+        "properties": {
+          "titleTask": {
+            "type": "string"
+          },
+          "descriptionTask": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 255
+          },
+          "titleCategory": {
+            "type": "string"
+          },
+          "descriptionCategory": {
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 255
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "titleTask",
+          "descriptionTask",
+          "titleCategory",
+          "descriptionCategory",
+          "status"
         ]
       },
       "UpdateCategoryTaskDto": {

@@ -26,23 +26,18 @@ export class CreateCategoryRascunhoOrquestador {
     const result = this.result();
 
     if (!idUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, usuário inválido para criar categoria')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, usuário inválido para criar categoria').setKey('idUser').add();
     }
 
     if (!categoryDto.titleCategory) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops, impossivel criar categoria sem um titulo')
-        .add();
+      notification.setType('ERROR').setMessage('Ops, impossivel criar categoria sem um titulo').setKey('titleCategory').add();
     }
 
     if (!categoryDto.descriptionCategory) {
       notification
         .setType('INFO')
         .setMessage('Ops, categoria criada sem descrição')
+        .setKey('titleCategory')
         .add();
     }
 
@@ -52,26 +47,22 @@ export class CreateCategoryRascunhoOrquestador {
         .setNotification(notification.build())
         .setSuccess(false)
         .build();
-
       throw new NotificationException(data);
     }
 
     return await this.transaction.runTransaction(async () => {
       const findUser = await this.usersService.findUserById(idUser);
 
-      if (!findUser) {
-        notification
-          .setType('ERROR')
-          .setMessage('Ops, usuário não encontrado')
-          .add();
-
-        const data = result
-          .setCode(404)
-          .setNotification(notification.build())
-          .setSuccess(false)
-          .build();
-
-        throw new NotificationException(data);
+      if (!findUser || !findUser.success) {
+        notification.setType('ERROR').setMessage('Ops, usuário não encontrado').setKey('idUser').add();
+        if (notification.verifyErrors()) {
+          const data = result
+            .setCode(404)
+            .setNotification(notification.build())
+            .setSuccess(false)
+            .build();
+          throw new NotificationException(data);
+        }
       }
 
       const createCategory = await this.categoryService.createCategory(
@@ -89,6 +80,7 @@ export class CreateCategoryRascunhoOrquestador {
         notification
           .setType('INFO')
           .setMessage('Opa, sua categoria de rascunho foi criada')
+          .setKey('titleCategory')
           .add();
 
         return result
@@ -103,8 +95,9 @@ export class CreateCategoryRascunhoOrquestador {
         notification
           .setType('ERROR')
           .setMessage(
-            'Ops, tivemos um problema ao crir seu rascunho de categoria',
+            'Ops, tivemos um problema ao criar seu rascunho de categoria',
           )
+          .setKey('titleCategory')
           .add();
 
         const data = result

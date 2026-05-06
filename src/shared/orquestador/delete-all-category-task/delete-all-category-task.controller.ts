@@ -1,4 +1,4 @@
-import { Controller, Body, Delete, Param } from '@nestjs/common';
+import { Controller, Delete, Param } from '@nestjs/common';
 import { User } from '../../core/@custom-decorators/user-request/user.request';
 import { JwtAuthGuard } from '../../../authentication/auth-guards/auth.jwt.guard';
 import { UseGuards } from '@nestjs/common';

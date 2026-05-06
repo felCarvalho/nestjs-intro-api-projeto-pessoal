@@ -6,6 +6,10 @@ import {
   UserRepositoryContract,
 } from '../contracts/index.contract';
 import { User } from '../entity/user.entity';
+import {
+  userNameSchemaValidator,
+  UserNameProps,
+} from '../../shared/core/strategy';
 
 export class UsersService {
   constructor(
@@ -15,54 +19,25 @@ export class UsersService {
     private readonly result: () => ResultBuilderContract<User>,
   ) {}
 
-  private verifyMinLength(data: string) {
-    const min = 8;
-
-    if (data.length < min) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private verifyMaxLength(data: string) {
-    const max = 150;
-
-    if (data.length > max) {
-      return true;
-    }
-
-    return false;
-  }
-
   async createUser(name: string) {
     const notification = this.notification();
     const result = this.result();
 
-    if (!name) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! Seu nome de usuário é inválido')
-        .add();
-    }
-
     const findUser = await this.userRepo.findName(name);
 
-    if (findUser) {
-      notification
-        .setType('ERROR')
-        .setMessage('Ops! já existe um usuário com esse nome')
-        .add();
-    }
+    const userProps: UserNameProps = {
+      name,
+      nameAlreadyExists: !!findUser,
+    };
 
-    if (notification.verifyErrors() || notification.verifyWarnings()) {
-      result
-        .setCode(404)
-        .setNotification(notification.build())
-        .setSuccess(false);
-      const resultException = result.build();
+    const validationResult = await userNameSchemaValidator.execute(userProps);
 
-      throw new NotificationException(resultException);
+    if (!validationResult.success) {
+      return result
+        .setCode(400)
+        .setNotification(validationResult.notifications)
+        .setSuccess(false)
+        .build();
     }
 
     const date = new Date();
@@ -78,20 +53,7 @@ export class UsersService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Erro ao criar nome de usuário')
-        .add();
-    }
-
-    if (this.verifyMinLength(userBuild.data.name)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Nome de usuário muito curto')
-        .add();
-    }
-
-    if (this.verifyMaxLength(userBuild.data.name)) {
-      notification
-        .setType('WARNING')
-        .setMessage('Ops! Nome de usuário muito grande')
+        .setKey('name')
         .add();
     }
 
@@ -108,6 +70,7 @@ export class UsersService {
     notification
       .setType('INFO')
       .setMessage('Opa! Seu usuário foi criado')
+      .setKey('name')
       .add();
 
     const data = result
@@ -127,7 +90,7 @@ export class UsersService {
     const result = this.result();
 
     if (!id) {
-      notification.setType('ERROR').setMessage('Ops! ID inválido').add();
+      notification.setType('ERROR').setMessage('Ops! ID inválido').setKey('id').add();
       result
         .setCode(400)
         .setNotification(notification.build())
@@ -143,6 +106,7 @@ export class UsersService {
       notification
         .setType('ERROR')
         .setMessage('Ops! Usuário não encontrado')
+        .setKey('id')
         .add();
 
       result
