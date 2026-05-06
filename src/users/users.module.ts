@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ResultBuilderContract } from 'src/shared/core/contracts/contracts.result';
 import { AuthModule } from '../authentication/auth.module';
 import { NotificationBuilderContract } from '../shared/core/contracts/contracts.notification';
+import { PersistContract } from '../shared/core/contracts/contracts.persistence';
 import { UserCreateBuilder } from './builder/create.builder';
 import {
   UserCreateBuilderContract,
@@ -43,12 +44,14 @@ import { ModuleCore } from '../shared/core/moduleCore/module.core';
         userCreateBuilder: () => UserCreateBuilderContract<User>,
         notification: () => NotificationBuilderContract,
         result: () => ResultBuilderContract<User>,
+        persist: PersistContract<User>,
       ) => {
         return new UsersService(
           userRepo,
           userCreateBuilder,
           notification,
           result,
+          persist,
         );
       },
       inject: [
@@ -56,6 +59,7 @@ import { ModuleCore } from '../shared/core/moduleCore/module.core';
         UserCreateBuilderContract,
         NotificationBuilderContract,
         ResultBuilderContract,
+        PersistContract,
       ],
     },
   ],

@@ -1,6 +1,7 @@
 import { NotificationException } from '../../shared/core/@custom-decorators/exception-custom/exception';
 import { NotificationBuilderContract } from '../../shared/core/contracts/contracts.notification';
 import { ResultBuilderContract } from '../../shared/core/contracts/contracts.result';
+import { PersistContract } from '../../shared/core/contracts/contracts.persistence';
 import {
   UserCreateBuilderContract,
   UserRepositoryContract,
@@ -10,6 +11,7 @@ import {
   userNameSchemaValidator,
   UserNameProps,
 } from '../../shared/core/strategy';
+import { isRequired, matches } from '../../shared/core/validators';
 
 export class UsersService {
   constructor(
@@ -17,6 +19,7 @@ export class UsersService {
     private readonly userBuilder: () => UserCreateBuilderContract<User>,
     private readonly notification: () => NotificationBuilderContract,
     private readonly result: () => ResultBuilderContract<User>,
+    private readonly persist: PersistContract<User>,
   ) {}
 
   async createUser(name: string) {
@@ -89,8 +92,12 @@ export class UsersService {
     const notification = this.notification();
     const result = this.result();
 
-    if (!id) {
-      notification.setType('ERROR').setMessage('Ops! ID inválido').setKey('id').add();
+    if (!isRequired(id)) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! ID inválido')
+        .setKey('id')
+        .add();
       result
         .setCode(400)
         .setNotification(notification.build())
@@ -124,5 +131,99 @@ export class UsersService {
       .setNotification(notification.build())
       .setSuccess(true)
       .build();
+  }
+
+  async updateUserName(id: string, name: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!isRequired(id)) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! ID inválido')
+        .setKey('id')
+        .add();
+    }
+
+    if (notification.verifyErrors()) {
+      result
+        .setCode(400)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    const existingUser = await this.userRepo.findName(name);
+
+    const userProps: UserNameProps = {
+      name,
+      nameAlreadyExists: !!(existingUser && !matches(existingUser.id, id)),
+    };
+
+    const validationResult = await userNameSchemaValidator.execute(userProps);
+
+    if (!validationResult.success) {
+      return result
+        .setCode(400)
+        .setNotification(validationResult.notifications)
+        .setSuccess(false)
+        .build();
+    }
+
+    const user = await this.userRepo.findById(id);
+
+    if (!user) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Usuário não encontrado')
+        .setKey('id')
+        .add();
+
+      result
+        .setCode(404)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    user.name = name;
+    this.persist.persist(user);
+
+    try {
+      await this.persist.commit();
+
+      notification
+        .setType('INFO')
+        .setMessage('Opa! Seu nome de usuário foi atualizado')
+        .setKey('name')
+        .add();
+
+      return result
+        .setCode(200)
+        .setData(user)
+        .setNotification(notification.build())
+        .setSuccess(true)
+        .build();
+    } catch (e) {
+      console.error(e);
+
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Ocorreu um erro ao atualizar o nome de usuário')
+        .setKey('name')
+        .add();
+
+      result
+        .setCode(500)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
   }
 }
