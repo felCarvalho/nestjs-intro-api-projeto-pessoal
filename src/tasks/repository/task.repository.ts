@@ -154,4 +154,14 @@ export class TasksRepository
       { populate: ['category'], filters: { isCategory: false } },
     );
   }
+
+  async findAllDeletedTasks(idUser: string) {
+    return await this.find(
+      { user: idUser },
+      {
+        populate: ['category'],
+        filters: { taskDeleted: true, taskActive: false },
+      },
+    );
+  }
 }

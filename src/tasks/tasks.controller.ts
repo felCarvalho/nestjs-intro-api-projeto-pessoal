@@ -77,8 +77,21 @@ export class TasksController {
     });
   }
 
+  @Get('deletados')
+  async getDeletedTasks(@User() user: { sub: string }) {
+    return await this.tasksService.findAllDeletedTasks(user.sub);
+  }
+
+  @Patch('restaurar/:id')
+  async restoreTask(@Param('id') id: string, @User() user: { sub: string }) {
+    return await this.tasksService.restoreTask({
+      idTask: id,
+      idUser: user.sub,
+    });
+  }
+
   @Delete(':id')
   async deleteTask(@Param('id') id: string, @User() user: { sub: string }) {
-    await this.tasksService.deletedTask({ idTask: id, idUser: user.sub });
+    return await this.tasksService.deletedTask({ idTask: id, idUser: user.sub });
   }
 }

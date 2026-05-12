@@ -440,6 +440,168 @@ export class TasksService {
     }
   }
 
+  async restoreTask({ idTask, idUser }: { idTask: string; idUser: string }) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!isRequired(idTask)) {
+      notification
+        .setType('ERROR')
+        .setKey('idTask')
+        .setMessage('Ops! id de tarefa inválido')
+        .add();
+    }
+
+    if (!isRequired(idUser)) {
+      notification
+        .setType('ERROR')
+        .setKey('idUser')
+        .setMessage('Ops! id de usuário inválido')
+        .add();
+    }
+
+    if (notification.verifyErrors()) {
+      const data = result
+        .setCode(400)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    const findTasks = await this.taskRepo.findByIdDeleted(idTask, idUser);
+
+    if (!findTasks) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Não conseguimos encontrar sua rotina deletada')
+        .add();
+
+      result
+        .setCode(404)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    if (!matches(findTasks.user.id, idUser)) {
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Você não tem permissão para restaurar essa rotina')
+        .add();
+
+      result.setNotification(notification.build()).setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+
+    findTasks.deleteAt = null;
+    this.persist.persist(findTasks);
+
+    try {
+      await this.persist.commit();
+
+      notification
+        .setType('INFO')
+        .setMessage('Opa, Sua rotina foi restaurada')
+        .add();
+
+      const data = result
+        .setCode(200)
+        .setData(this.persist.fromObject(findTasks))
+        .setNotification(notification.build())
+        .setSuccess(true)
+        .build();
+
+      return data;
+    } catch (e) {
+      console.error(e);
+
+      notification
+        .setType('ERROR')
+        .setMessage('Ops! Ocorreu um erro ao restaurar sua rotina')
+        .add();
+
+      result
+        .setCode(500)
+        .setNotification(notification.build())
+        .setSuccess(false);
+      const resultException = result.build();
+
+      throw new NotificationException(resultException);
+    }
+  }
+
+  async restoreAllTasksByCategory(idUser: string, idCategory: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!isRequired(idUser)) {
+      notification
+        .setType('ERROR')
+        .setKey('idUser')
+        .setMessage('Ops! id de usuário inválido')
+        .add();
+    }
+
+    if (!isRequired(idCategory)) {
+      notification
+        .setType('ERROR')
+        .setKey('idCategory')
+        .setMessage('Ops! id de categoria inválido')
+        .add();
+    }
+
+    if (notification.verifyErrors()) {
+      const data = result
+        .setCode(400)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    try {
+      await (this.taskRepo as any).nativeUpdate(
+        { category: idCategory, user: idUser },
+        { deleteAt: null },
+      );
+
+      notification
+        .setType('INFO')
+        .setMessage('Opa, Suas tarefas da categoria foram restauradas')
+        .add();
+
+      return result
+        .setCode(200)
+        .setNotification(notification.build())
+        .setSuccess(true)
+        .build();
+    } catch (e) {
+      console.error(e);
+
+      notification
+        .setType('ERROR')
+        .setMessage(
+          'Ops! Ocorreu um erro ao restaurar suas tarefas da categoria',
+        )
+        .add();
+
+      const data = result
+        .setCode(500)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+  }
+
   async allTasksDeleted(idUser: string, idCategory: string) {
     return await this.taskRepo.deleteAllTasks(idCategory, idUser);
   }
@@ -759,6 +921,37 @@ export class TasksService {
       .build();
 
     return data;
+  }
+
+  async findAllDeletedTasks(idUser: string) {
+    const notification = this.notification();
+    const result = this.result();
+
+    if (!isRequired(idUser)) {
+      notification
+        .setType('ERROR')
+        .setKey('idUser')
+        .setMessage('Ops! id de usuário inválido')
+        .add();
+
+      const data = result
+        .setCode(400)
+        .setNotification(notification.build())
+        .setSuccess(false)
+        .build();
+
+      throw new NotificationException(data);
+    }
+
+    const findDeletedTasks =
+      await this.taskRepo.findAllDeletedTasks(idUser);
+
+    return result
+      .setCode(200)
+      .setData(findDeletedTasks)
+      .setSuccess(true)
+      .setNotification(notification.build())
+      .build();
   }
 
   async findAllRascunhos(id: string) {

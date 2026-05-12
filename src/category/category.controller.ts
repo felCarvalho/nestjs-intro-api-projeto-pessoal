@@ -32,7 +32,7 @@ export class CategoryController {
   }
 
   @Patch('rascunhos/atualizar-categoria/:id')
-  async updateCategoryRascunhos(
+  async updateCategoryRascunho(
     @User() user: { sub: string },
     @Body() category: UpdateCategoryDto,
     @Param('id') id: string,
