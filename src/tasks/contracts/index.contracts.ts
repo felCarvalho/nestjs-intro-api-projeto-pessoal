@@ -23,6 +23,7 @@ export abstract class TaskRepositoryContract<T> {
   abstract findWeekTasks(idUser: string, start: Date, end: Date): Promise<T[]>;
   abstract findMonthTasks(idUser: string, start: Date, end: Date): Promise<T[]>;
   abstract findAllPeriodTasks(idUser: string): Promise<T[]>;
+  abstract findAllDeletedTasks(idUser: string): Promise<T[]>;
 }
 
 export abstract class TaskBuilderContract<T> {
