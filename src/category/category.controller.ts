@@ -31,6 +31,15 @@ export class CategoryController {
     return await this.categoryService.updateCategory(category, id, user.sub);
   }
 
+  @Patch('rascunhos/atualizar-categoria/:id')
+  async updateCategoryRascunho(
+    @User() user: { sub: string },
+    @Body() category: UpdateCategoryDto,
+    @Param('id') id: string,
+  ) {
+    return await this.categoryService.updateCategory(category, id, user.sub);
+  }
+
   @Delete('rascunhos/deletar-categoria/:id')
   async deleteCategory(@User() user: { sub: string }, @Param('id') id: string) {
     return await this.categoryService.deleteCategoryRascunhos(id, user.sub);
